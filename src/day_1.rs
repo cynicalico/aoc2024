@@ -12,8 +12,8 @@ fn main() {
     println!("P2: {}", calculate_p2_ans(&l1, &l2));
 }
 
-fn calculate_p1_ans(l1: &[i32], l2: &[i32]) -> i32 {
-    l1.iter().zip(l2).map(|(n, m)| (n - m).abs()).sum()
+fn calculate_p1_ans(l1: &[i32], l2: &[i32]) -> u32 {
+    l1.iter().zip(l2).map(|(n, m)| n.abs_diff(*m)).sum()
 }
 
 fn calculate_p2_ans(l1: &[i32], l2: &[i32]) -> i32 {
@@ -31,10 +31,7 @@ fn parse_puzzle_input() -> (Vec<i32>, Vec<i32>) {
         .flatten()
         .map(|line| {
             let (_, [n, m]) = re.captures(line.as_str()).unwrap().extract();
-            (
-                n.parse::<i32>().ok().unwrap(),
-                m.parse::<i32>().ok().unwrap(),
-            )
+            (n.parse::<i32>().unwrap(), m.parse::<i32>().unwrap())
         })
         .unzip()
 }
