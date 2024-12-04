@@ -43,6 +43,14 @@ where
         self.height
     }
 
+    pub fn get(&self, y: usize, x: usize) -> Option<&T> {
+        if y < self.height && x < self.width {
+            Some(&self.data[(y * self.width) + x])
+        } else {
+            None
+        }
+    }
+
     pub fn push_row(&mut self, new_row: Vec<T>) {
         if self.width > 0 {
             assert_eq!(self.width, new_row.len());
