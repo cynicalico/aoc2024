@@ -1,7 +1,12 @@
+/* https://adventofcode.com/2024/day/2
+ */
+
 use aoc2024::read_lines;
 use itertools::Itertools;
 
 fn main() {
+    let start = std::time::Instant::now();
+
     let reports = parse_puzzle_input();
 
     let (safe_reports, unsafe_reports): (Vec<&[i32]>, Vec<&[i32]>) = reports
@@ -14,6 +19,7 @@ fn main() {
         "P2: {}",
         safe_reports.len() + dampen_problems(&unsafe_reports)
     );
+    println!("Took {}ms", start.elapsed().as_millis());
 }
 
 fn dampen_problems(unsafe_reports: &[&[i32]]) -> usize {

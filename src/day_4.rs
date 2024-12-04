@@ -1,19 +1,25 @@
-use aoc2024::{read_lines, Vec2D};
+/* https://adventofcode.com/2024/day/4
+ */
+
+use aoc2024::read_lines;
 use itertools::Itertools;
 
 fn main() {
+    let start = std::time::Instant::now();
+
     let word_search = parse_puzzle_input();
 
     println!("P1: {}", calculate_p1_ans(&word_search));
     println!("P2: {}", calculate_p2_ans(&word_search));
+    println!("Took {}ms", start.elapsed().as_millis());
 }
 
-fn calculate_p1_ans(word_search: &Vec2D<char>) -> u32 {
+fn calculate_p1_ans(word_search: &[Vec<char>]) -> u32 {
     let mut p1_ans = 0;
 
-    for y in 0..word_search.height() {
-        for x in 0..word_search.width() {
-            if word_search[(y, x)] != 'X' {
+    for y in 0..word_search.len() {
+        for x in 0..word_search[y].len() {
+            if word_search[y][x] != 'X' {
                 continue;
             }
 
@@ -24,7 +30,7 @@ fn calculate_p1_ans(word_search: &Vec2D<char>) -> u32 {
     p1_ans
 }
 
-fn count_xmas(word_search: &Vec2D<char>, y: usize, x: usize) -> u32 {
+fn count_xmas(word_search: &[Vec<char>], y: usize, x: usize) -> u32 {
     let mut n = 0;
 
     let word: Vec<char> = vec!['X', 'M', 'A', 'S'];
@@ -41,7 +47,13 @@ fn count_xmas(word_search: &Vec2D<char>, y: usize, x: usize) -> u32 {
                     (x as i32 + (i as i32 * dx)) as usize,
                 );
 
-                if *word_search.get(pos.0, pos.1).unwrap_or(&'\0') != word[i] {
+                let c = if let Some(row) = word_search.get(pos.0) {
+                    row.get(pos.1)
+                } else {
+                    None
+                };
+
+                if *c.unwrap_or(&'\0') != word[i] {
                     found_word = false;
                     break;
                 }
@@ -55,12 +67,12 @@ fn count_xmas(word_search: &Vec2D<char>, y: usize, x: usize) -> u32 {
     n
 }
 
-fn calculate_p2_ans(word_search: &Vec2D<char>) -> u32 {
+fn calculate_p2_ans(word_search: &[Vec<char>]) -> u32 {
     let mut p2_ans = 0;
 
-    for y in 1..word_search.height() - 1 {
-        for x in 1..word_search.width() - 1 {
-            if word_search[(y, x)] != 'A' {
+    for y in 1..word_search.len() - 1 {
+        for x in 1..word_search[y].len() - 1 {
+            if word_search[y][x] != 'A' {
                 continue;
             }
 
@@ -73,11 +85,11 @@ fn calculate_p2_ans(word_search: &Vec2D<char>) -> u32 {
     p2_ans
 }
 
-fn check_x_mas(word_search: &Vec2D<char>, y: usize, x: usize) -> bool {
-    let tl = word_search[(y - 1, x - 1)];
-    let bl = word_search[(y + 1, x - 1)];
-    let tr = word_search[(y - 1, x + 1)];
-    let br = word_search[(y + 1, x + 1)];
+fn check_x_mas(word_search: &[Vec<char>], y: usize, x: usize) -> bool {
+    let tl = word_search[y - 1][x - 1];
+    let bl = word_search[y + 1][x - 1];
+    let tr = word_search[y - 1][x + 1];
+    let br = word_search[y + 1][x + 1];
 
     // Only four possibilities, A is always anchored in the middle
     (tl == 'M' && bl == 'M' && tr == 'S' && br == 'S')
@@ -86,15 +98,10 @@ fn check_x_mas(word_search: &Vec2D<char>, y: usize, x: usize) -> bool {
         || (tl == 'S' && bl == 'M' && tr == 'S' && br == 'M')
 }
 
-fn parse_puzzle_input() -> Vec2D<char> {
-    let mut word_search = Vec2D::new(None, None);
-
+fn parse_puzzle_input() -> Vec<Vec<char>> {
     read_lines("input/day_4.txt")
         .unwrap()
         .flatten()
-        .for_each(|line| {
-            word_search.push_row(line.chars().collect_vec());
-        });
-
-    word_search
+        .map(|line| line.chars().collect_vec())
+        .collect_vec()
 }

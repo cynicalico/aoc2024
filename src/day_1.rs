@@ -1,8 +1,13 @@
+/* https://adventofcode.com/2024/day/1
+ */
+
 use aoc2024::read_lines;
 use itertools::Itertools;
 use regex::Regex;
 
 fn main() {
+    let start = std::time::Instant::now();
+
     let (mut l1, mut l2) = parse_puzzle_input();
 
     l1.sort();
@@ -10,6 +15,7 @@ fn main() {
 
     println!("P1: {}", calculate_p1_ans(&l1, &l2));
     println!("P2: {}", calculate_p2_ans(&l1, &l2));
+    println!("Took {}ms", start.elapsed().as_millis());
 }
 
 fn calculate_p1_ans(l1: &[i32], l2: &[i32]) -> u32 {

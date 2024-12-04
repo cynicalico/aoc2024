@@ -1,11 +1,17 @@
+/* https://adventofcode.com/2024/day/3
+ */
+
 use aoc2024::read_lines;
 use regex::Regex;
 
 fn main() {
+    let start = std::time::Instant::now();
+
     let instructions = parse_puzzle_input();
 
     println!("P1: {}", calculate_p1_ans(&instructions));
     println!("P2: {}", calculate_p2_ans(&instructions));
+    println!("Took {}ms", start.elapsed().as_millis());
 }
 
 enum Instruction {
