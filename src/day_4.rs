@@ -47,12 +47,7 @@ fn count_xmas(word_search: &[Vec<char>], y: usize, x: usize) -> u32 {
                     (x as i32 + (i as i32 * dx)) as usize,
                 );
 
-                let c = if let Some(row) = word_search.get(pos.0) {
-                    row.get(pos.1)
-                } else {
-                    None
-                };
-
+                let c = word_search.get(pos.0).and_then(|row| row.get(pos.1));
                 if *c.unwrap_or(&'\0') != word[i] {
                     found_word = false;
                     break;
