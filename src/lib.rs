@@ -11,7 +11,7 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-pub struct Arr2D<T>
+pub struct Vec2D<T>
 where
     T: Clone + Default,
 {
@@ -20,7 +20,7 @@ where
     data: Vec<T>,
 }
 
-impl<T> Arr2D<T>
+impl<T> Vec2D<T>
 where
     T: Clone + Default,
 {
@@ -63,7 +63,7 @@ where
     }
 }
 
-impl<T> Index<(usize, usize)> for Arr2D<T>
+impl<T> Index<(usize, usize)> for Vec2D<T>
 where
     T: Clone + Default,
 {
@@ -74,7 +74,7 @@ where
     }
 }
 
-impl<T> IndexMut<(usize, usize)> for Arr2D<T>
+impl<T> IndexMut<(usize, usize)> for Vec2D<T>
 where
     T: Clone + Default,
 {

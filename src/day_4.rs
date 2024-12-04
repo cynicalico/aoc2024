@@ -1,4 +1,4 @@
-use aoc2024::{read_lines, Arr2D};
+use aoc2024::{read_lines, Vec2D};
 use itertools::Itertools;
 
 fn main() {
@@ -8,7 +8,7 @@ fn main() {
     println!("P2: {}", calculate_p2_ans(&word_search));
 }
 
-fn calculate_p1_ans(word_search: &Arr2D<char>) -> u32 {
+fn calculate_p1_ans(word_search: &Vec2D<char>) -> u32 {
     let mut p1_ans = 0;
 
     for y in 0..word_search.height() {
@@ -24,7 +24,7 @@ fn calculate_p1_ans(word_search: &Arr2D<char>) -> u32 {
     p1_ans
 }
 
-fn count_xmas(word_search: &Arr2D<char>, y: usize, x: usize) -> u32 {
+fn count_xmas(word_search: &Vec2D<char>, y: usize, x: usize) -> u32 {
     let mut n = 0;
 
     let word: Vec<char> = vec!['X', 'M', 'A', 'S'];
@@ -60,7 +60,7 @@ fn count_xmas(word_search: &Arr2D<char>, y: usize, x: usize) -> u32 {
     n
 }
 
-fn calculate_p2_ans(word_search: &Arr2D<char>) -> u32 {
+fn calculate_p2_ans(word_search: &Vec2D<char>) -> u32 {
     let mut p2_ans = 0;
 
     for y in 1..word_search.height() - 1 {
@@ -79,7 +79,7 @@ fn calculate_p2_ans(word_search: &Arr2D<char>) -> u32 {
 }
 
 #[rustfmt::skip]
-fn check_x_mas(word_search: &Arr2D<char>, y: usize, x: usize) -> bool {
+fn check_x_mas(word_search: &Vec2D<char>, y: usize, x: usize) -> bool {
     // Only four possibilities, A is always anchored in the middle
     (word_search[(y - 1, x - 1)] == 'M'
         && word_search[(y + 1, x - 1)] == 'M'
@@ -99,8 +99,8 @@ fn check_x_mas(word_search: &Arr2D<char>, y: usize, x: usize) -> bool {
         && word_search[(y + 1, x + 1)] == 'M')
 }
 
-fn parse_puzzle_input() -> Arr2D<char> {
-    let mut word_search = Arr2D::new(None, None);
+fn parse_puzzle_input() -> Vec2D<char> {
+    let mut word_search = Vec2D::new(None, None);
 
     read_lines("input/day_4.txt")
         .unwrap()
