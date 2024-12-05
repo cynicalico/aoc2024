@@ -21,33 +21,27 @@ enum Instruction {
 }
 
 fn calculate_p1_ans(instructions: &[Instruction]) -> i32 {
-    instructions
-        .iter()
-        .map(|i| match i {
-            Instruction::Do => 0,
-            Instruction::DoNot => 0,
-            Instruction::Mul(n, m) => n * m,
-        })
-        .sum()
+    instructions.iter().fold(0, |acc, i| match i {
+        Instruction::Mul(n, m) => acc + n * m,
+        _ => acc,
+    })
 }
 
 fn calculate_p2_ans(instructions: &[Instruction]) -> i32 {
-    let mut sum = 0;
-    let mut mult_enabled = true;
-
-    for i in instructions {
-        match i {
-            Instruction::Do => mult_enabled = true,
-            Instruction::DoNot => mult_enabled = false,
+    instructions
+        .iter()
+        .fold((0, true), |(acc, mul_enabled), i| match i {
+            Instruction::Do => (acc, true),
+            Instruction::DoNot => (acc, false),
             Instruction::Mul(n, m) => {
-                if mult_enabled {
-                    sum += n * m;
+                if mul_enabled {
+                    (acc + n * m, mul_enabled)
+                } else {
+                    (acc, mul_enabled)
                 }
             }
-        }
-    }
-
-    sum
+        })
+        .0
 }
 
 fn parse_puzzle_input() -> Vec<Instruction> {
