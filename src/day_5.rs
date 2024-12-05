@@ -12,7 +12,7 @@ fn main() {
 
     let (valid_updates, invalid_updates): (Vec<_>, Vec<_>) = updates.into_iter().partition(|u| {
         for i in 0..u.len() {
-            for j in i..u.len() {
+            for j in i + 1..u.len() {
                 match ordering.get(&u[j]) {
                     None => continue,
                     Some(j_hs) => {
@@ -41,7 +41,7 @@ fn calculate_p2_ans(ordering: &HashMap<u32, HashSet<u32>>, invalid_updates: &[Ve
         .map(|u| {
             let mut u = u.to_owned();
             for i in 0..u.len() {
-                for j in i..u.len() {
+                for j in i + 1..u.len() {
                     match ordering.get(&u[j]) {
                         None => continue,
                         Some(j_hs) => {
