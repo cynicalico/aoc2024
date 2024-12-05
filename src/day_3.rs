@@ -12,7 +12,7 @@ fn main() {
 
     println!("P1: {}", calculate_p1_ans(&instructions));
     println!("P2: {}", calculate_p2_ans(&instructions));
-    println!("Took {}ms", start.elapsed().as_millis());
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
 enum Instruction {

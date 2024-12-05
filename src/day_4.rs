@@ -11,7 +11,7 @@ fn main() {
 
     println!("P1: {}", calculate_p1_ans(&word_search));
     println!("P2: {}", calculate_p2_ans(&word_search));
-    println!("Took {}ms", start.elapsed().as_millis());
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
 fn calculate_p1_ans(word_search: &[Vec<char>]) -> u32 {

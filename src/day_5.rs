@@ -23,7 +23,7 @@ fn main() {
 
     println!("P1: {}", calculate_p1_ans(&valid_updates));
     println!("P2: {}", calculate_p2_ans(&ordering, &invalid_updates));
-    println!("Took {}ms", start.elapsed().as_millis());
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
 fn calculate_p1_ans(valid_updates: &[Vec<u32>]) -> u32 {

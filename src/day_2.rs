@@ -19,7 +19,7 @@ fn main() {
         "P2: {}",
         safe_reports.len() + dampen_problems(&unsafe_reports)
     );
-    println!("Took {}ms", start.elapsed().as_millis());
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
 fn dampen_problems(unsafe_reports: &[&[i32]]) -> usize {
