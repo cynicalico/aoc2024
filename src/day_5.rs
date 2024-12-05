@@ -55,7 +55,7 @@ fn calculate_p2_ans(ordering: &HashMap<u32, HashSet<u32>>, invalid_updates: &[Ve
 }
 
 fn parse_puzzle_input() -> (HashMap<u32, HashSet<u32>>, Vec<Vec<u32>>) {
-    let mut ordering: HashMap<u32, HashSet<u32>> = HashMap::new();
+    let mut ordering = HashMap::<u32, HashSet<u32>>::new();
     let mut updates = Vec::new();
 
     read_lines_partitioned(
