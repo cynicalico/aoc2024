@@ -1,4 +1,3 @@
-use itertools::Itertools;
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::Path;
@@ -11,12 +10,25 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-pub fn read_lines_partitioned<P>(filename: P) -> io::Result<(Vec<String>, Vec<String>)>
+pub fn read_lines_partitioned<P, F1, F2>(filename: P, mut f1: F1, mut f2: F2) -> io::Result<()>
 where
     P: AsRef<Path>,
+    F1: FnMut(String),
+    F2: FnMut(String),
 {
-    let file = File::open(filename)?;
-    let lines = io::BufReader::new(file).lines().flatten().collect_vec();
-    let (a, b) = lines.split_at(lines.iter().position(|s| s.is_empty()).unwrap());
-    Ok((a.to_vec(), b[1..].to_vec()))
+    let mut seen_partition = false;
+    for line in read_lines(filename)?.flatten() {
+        if line.is_empty() {
+            seen_partition = true;
+            continue;
+        }
+
+        if !seen_partition {
+            f1(line);
+        } else {
+            f2(line);
+        }
+    }
+
+    Ok(())
 }

@@ -58,30 +58,30 @@ fn parse_puzzle_input() -> (HashMap<u32, HashSet<u32>>, Vec<Vec<u32>>) {
     let mut ordering: HashMap<u32, HashSet<u32>> = HashMap::new();
     let mut updates = Vec::new();
 
-    let (ordering_rules, page_numbers) = read_lines_partitioned("input/day_5.txt").unwrap();
-
-    for rule in ordering_rules {
-        if let Some((before, after)) = rule
-            .split("|")
-            .map(|n| n.parse::<u32>().unwrap())
-            .collect_tuple()
-        {
-            if let Some(hs) = ordering.get_mut(&before) {
-                hs.insert(after);
-            } else {
-                ordering.insert(before, HashSet::from([after]));
-            }
-        }
-    }
-
-    for numbers in page_numbers {
-        updates.push(
-            numbers
-                .split(",")
+    read_lines_partitioned(
+        "input/day_5.txt",
+        |line| {
+            if let Some((before, after)) = line
+                .split("|")
                 .map(|n| n.parse::<u32>().unwrap())
-                .collect_vec(),
-        );
-    }
+                .collect_tuple()
+            {
+                if let Some(hs) = ordering.get_mut(&before) {
+                    hs.insert(after);
+                } else {
+                    ordering.insert(before, HashSet::from([after]));
+                }
+            }
+        },
+        |line| {
+            updates.push(
+                line.split(",")
+                    .map(|n| n.parse::<u32>().unwrap())
+                    .collect_vec(),
+            );
+        },
+    )
+    .expect("Failed to read input file");
 
     (ordering, updates)
 }
