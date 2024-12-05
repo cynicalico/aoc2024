@@ -2,9 +2,9 @@
 
 /* https://adventofcode.com/2024/day/5
  */
-
 use aoc2024::read_lines_partitioned;
 use itertools::Itertools;
+use std::cmp::Ordering;
 use std::collections::{HashMap, HashSet};
 
 fn main() {
@@ -13,16 +13,12 @@ fn main() {
     let (ordering, updates) = parse_puzzle_input();
 
     let (valid_updates, invalid_updates): (Vec<_>, Vec<_>) = updates.into_iter().partition(|u| {
-        for i in 0..u.len() {
-            for j in i + 1..u.len() {
-                if let Some(o) = ordering.get(&u[j])
-                    && o.contains(&u[i])
-                {
-                    return false;
-                }
-            }
-        }
-        true
+        u.is_sorted_by(|a, b| {
+            ordering
+                .get(b)
+                .and_then(|o| Some(!o.contains(a)))
+                .unwrap_or(true)
+        })
     });
 
     println!("P1: {}", calculate_p1_ans(&valid_updates));
@@ -39,15 +35,18 @@ fn calculate_p2_ans(ordering: &HashMap<u32, HashSet<u32>>, invalid_updates: &[Ve
         .iter()
         .map(|u| {
             let mut u = u.to_owned();
-            for i in 0..u.len() {
-                for j in i + 1..u.len() {
-                    if let Some(o) = ordering.get(&u[j])
-                        && o.contains(&u[i])
-                    {
-                        u.swap(i, j);
-                    }
-                }
-            }
+            u.sort_by(|a, b| {
+                ordering
+                    .get(b)
+                    .and_then(|o| {
+                        Some(if o.contains(a) {
+                            Ordering::Greater
+                        } else {
+                            Ordering::Less
+                        })
+                    })
+                    .unwrap_or(Ordering::Equal)
+            });
             u
         })
         .map(|u| u[u.len() / 2])
