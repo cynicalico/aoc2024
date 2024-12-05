@@ -2,6 +2,7 @@
  */
 
 use aoc2024::read_lines;
+use itertools::Itertools;
 use regex::Regex;
 
 fn main() {
@@ -45,21 +46,28 @@ fn calculate_p2_ans(instructions: &[Instruction]) -> i32 {
 }
 
 fn parse_puzzle_input() -> Vec<Instruction> {
-    let re = Regex::new(r"(do|don't|mul)\((?:(\d{1,3}),(\d{1,3}))?\)").unwrap();
+    let re = Regex::new(r"(do)\(\)|(don't)\(\)|(mul)\((\d{1,3}),(\d{1,3})\)").unwrap();
 
     let mut instructions = Vec::<Instruction>::new();
 
     for line in read_lines("input/day_3.txt").unwrap().flatten() {
         for c in re.captures_iter(&line) {
-            instructions.push(match c.get(1).unwrap().as_str() {
+            // This regex returns 5 groups, and each instruction is non-overlapping, so
+            // we can filter out the None groups, and be left with a tag group, followed by
+            // the arguments for that tag if they exist
+            let cap_str = c
+                .iter()
+                .filter_map(|m| m)
+                .map(|m| m.as_str())
+                .skip(1)
+                .collect_vec();
+
+            instructions.push(match cap_str[0] {
                 "do" => Instruction::Do,
                 "don't" => Instruction::DoNot,
-                "mul" => Instruction::Mul(
-                    c.get(2).unwrap().as_str().parse().unwrap(),
-                    c.get(3).unwrap().as_str().parse().unwrap(),
-                ),
+                "mul" => Instruction::Mul(cap_str[1].parse().unwrap(), cap_str[2].parse().unwrap()),
                 _ => unreachable!(),
-            })
+            });
         }
     }
 
