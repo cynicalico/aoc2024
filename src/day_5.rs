@@ -8,8 +8,8 @@ use std::collections::{HashMap, HashSet};
 fn main() {
     let start = std::time::Instant::now();
 
-    let (ordering_rules, updates) = parse_puzzle_input();
-    let ordering = build_ordering_hashmap(&ordering_rules);
+    let (ordering, updates) = parse_puzzle_input();
+
     let (valid_updates, invalid_updates): (Vec<_>, Vec<_>) = updates.into_iter().partition(|u| {
         for i in 0..u.len() {
             for j in i..u.len() {
@@ -58,25 +58,9 @@ fn calculate_p2_ans(ordering: &HashMap<u32, HashSet<u32>>, invalid_updates: &[Ve
         .sum()
 }
 
-fn build_ordering_hashmap(ordering_rules: &[(u32, u32)]) -> HashMap<u32, HashSet<u32>> {
-    let mut ordering: HashMap<u32, HashSet<u32>> = HashMap::new();
-    for (before, after) in ordering_rules {
-        match ordering.get_mut(before) {
-            None => {
-                ordering.insert(*before, HashSet::from([*after]));
-            }
-            Some(hs) => {
-                hs.insert(*after);
-            }
-        }
-    }
-
-    ordering
-}
-
-fn parse_puzzle_input() -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
-    let mut ordering_rules: Vec<(u32, u32)> = Vec::new();
-    let mut updates: Vec<Vec<u32>> = Vec::new();
+fn parse_puzzle_input() -> (HashMap<u32, HashSet<u32>>, Vec<Vec<u32>>) {
+    let mut ordering = HashMap::new();
+    let mut updates = Vec::new();
 
     let mut reading_ordering_rules = true;
     for line in read_lines("input/day_5.txt").unwrap().flatten() {
@@ -86,14 +70,22 @@ fn parse_puzzle_input() -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
         }
 
         if reading_ordering_rules {
-            let Some((n, m)) = line
+            if let Some((before, after)) = line
                 .split("|")
                 .map(|n| n.parse::<u32>().unwrap())
                 .collect_tuple()
-            else {
+            {
+                match ordering.get_mut(&before) {
+                    None => {
+                        ordering.insert(before, HashSet::from([after]));
+                    }
+                    Some(hs) => {
+                        hs.insert(after);
+                    }
+                }
+            } else {
                 unreachable!()
             };
-            ordering_rules.push((n, m));
         } else {
             updates.push(
                 line.split(",")
@@ -103,5 +95,5 @@ fn parse_puzzle_input() -> (Vec<(u32, u32)>, Vec<Vec<u32>>) {
         }
     }
 
-    (ordering_rules, updates)
+    (ordering, updates)
 }
