@@ -126,16 +126,15 @@ fn parse_puzzle_input() -> (Map, (usize, usize)) {
     let mut lab = Vec::new();
 
     for line in read_lines("input/day_6.txt").unwrap().flatten() {
-        let chars = line.chars().collect_vec();
+        let chars = line.chars();
 
-        if let Some(guard_pos) = chars.iter().position(|&c| c == '^') {
+        if let Some(guard_pos) = chars.clone().position(|c| c == '^') {
             guard_start_pos = (lab.len(), guard_pos);
         }
 
         lab.push(
             chars
-                .iter()
-                .map(|&c| Cell {
+                .map(|c| Cell {
                     obstacle: c == '#',
                     visited_deltas: vec![],
                 })
