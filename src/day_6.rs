@@ -10,15 +10,14 @@ fn main() {
     let (mut lab, guard_start_pos) = parse_puzzle_input();
     let (p1_ans, p2_ans) = calculate_ans(&mut lab, guard_start_pos);
 
-    println!("P1: {}", p1_ans);
-    println!("P2: {}", p2_ans);
+    println!("P1: {p1_ans}");
+    println!("P2: {p2_ans}");
     println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
 struct Cell {
     obstacle: bool,
-    visited: bool,
-    deltas: Vec<(i32, i32)>,
+    visited_deltas: Vec<(i32, i32)>,
 }
 
 type Map = Vec<Vec<Cell>>;
@@ -45,7 +44,7 @@ fn calculate_ans(lab: &mut Map, guard_start_pos: (usize, usize)) -> (usize, u32)
         .flat_map(|(y, row)| {
             row.iter()
                 .enumerate()
-                .map(move |(x, c)| if c.visited { Some((y, x)) } else { None })
+                .map(move |(x, c)| (!c.visited_deltas.is_empty()).then_some((y, x)))
         })
         .flatten()
         .collect_vec();
@@ -78,13 +77,13 @@ fn reset_lab(lab: &mut Map, guard: &mut Guard, guard_start_pos: (usize, usize)) 
 
     for row in lab.iter_mut() {
         for cell in row.iter_mut() {
-            cell.visited = false;
-            cell.deltas.clear();
+            cell.visited_deltas.clear();
         }
     }
 
-    lab[guard.pos.0][guard.pos.1].visited = true;
-    lab[guard.pos.0][guard.pos.1].deltas.push(guard.delta);
+    lab[guard.pos.0][guard.pos.1]
+        .visited_deltas
+        .push(guard.delta);
 }
 
 fn try_get_step_pos(lab: &Map, guard: &Guard) -> Option<(usize, usize)> {
@@ -92,15 +91,11 @@ fn try_get_step_pos(lab: &Map, guard: &Guard) -> Option<(usize, usize)> {
         guard.pos.0 as i32 + guard.delta.0,
         guard.pos.1 as i32 + guard.delta.1,
     );
-    if step_pos.0 < 0
-        || step_pos.0 >= lab.len() as i32
-        || step_pos.1 < 0
-        || step_pos.1 >= lab[0].len() as i32
-    {
-        None
-    } else {
-        Some((step_pos.0 as usize, step_pos.1 as usize))
-    }
+    (step_pos.0 >= 0
+        && step_pos.0 < lab.len() as i32
+        && step_pos.1 >= 0
+        && step_pos.1 < lab[0].len() as i32)
+        .then_some((step_pos.0 as usize, step_pos.1 as usize))
 }
 
 fn do_step(lab: &mut Map, guard: &mut Guard, step_pos: &(usize, usize)) -> bool {
@@ -112,14 +107,16 @@ fn do_step(lab: &mut Map, guard: &mut Guard, step_pos: &(usize, usize)) -> bool 
         guard.pos = *step_pos;
     }
 
-    if lab[guard.pos.0][guard.pos.1].visited
-        && lab[guard.pos.0][guard.pos.1].deltas.contains(&guard.delta)
+    if lab[guard.pos.0][guard.pos.1]
+        .visited_deltas
+        .contains(&guard.delta)
     {
         loop_detected = true;
     }
 
-    lab[guard.pos.0][guard.pos.1].visited = true;
-    lab[guard.pos.0][guard.pos.1].deltas.push(guard.delta);
+    lab[guard.pos.0][guard.pos.1]
+        .visited_deltas
+        .push(guard.delta);
 
     loop_detected
 }
@@ -129,12 +126,10 @@ fn parse_puzzle_input() -> (Map, (usize, usize)) {
     let mut lab = Vec::new();
 
     for line in read_lines("input/day_6.txt").unwrap().flatten() {
-        let mut chars = line.chars().collect_vec();
+        let chars = line.chars().collect_vec();
 
         if let Some(guard_pos) = chars.iter().position(|&c| c == '^') {
-            guard_start_pos.0 = lab.len();
-            guard_start_pos.1 = guard_pos;
-            chars[guard_pos] = '*';
+            guard_start_pos = (lab.len(), guard_pos);
         }
 
         lab.push(
@@ -142,8 +137,7 @@ fn parse_puzzle_input() -> (Map, (usize, usize)) {
                 .iter()
                 .map(|&c| Cell {
                     obstacle: c == '#',
-                    visited: false,
-                    deltas: vec![],
+                    visited_deltas: vec![],
                 })
                 .collect_vec(),
         )
