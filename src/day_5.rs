@@ -2,6 +2,7 @@
 
 /* https://adventofcode.com/2024/day/5
  */
+
 use aoc2024::read_lines_partitioned;
 use itertools::Itertools;
 use std::cmp::Ordering;

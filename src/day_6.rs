@@ -1,0 +1,153 @@
+/* https://adventofcode.com/2024/day/6
+ */
+
+use aoc2024::read_lines;
+use itertools::Itertools;
+
+fn main() {
+    let start = std::time::Instant::now();
+
+    let (mut lab, guard_start_pos) = parse_puzzle_input();
+    let (p1_ans, p2_ans) = calculate_ans(&mut lab, guard_start_pos);
+
+    println!("P1: {}", p1_ans);
+    println!("P2: {}", p2_ans);
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+}
+
+struct Cell {
+    obstacle: bool,
+    visited: bool,
+    deltas: Vec<(i32, i32)>,
+}
+
+type Map = Vec<Vec<Cell>>;
+
+struct Guard {
+    pos: (usize, usize),
+    delta: (i32, i32),
+}
+
+fn calculate_ans(lab: &mut Map, guard_start_pos: (usize, usize)) -> (usize, u32) {
+    let mut guard = Guard {
+        pos: guard_start_pos,
+        delta: (0, -1),
+    };
+
+    reset_lab(lab, &mut guard, guard_start_pos);
+    while let Some(step_pos) = try_get_step_pos(lab, &guard) {
+        do_step(lab, &mut guard, &step_pos);
+    }
+
+    let possible_obstacle_locations = lab
+        .iter()
+        .enumerate()
+        .flat_map(|(y, row)| {
+            row.iter()
+                .enumerate()
+                .map(move |(x, c)| if c.visited { Some((y, x)) } else { None })
+        })
+        .flatten()
+        .collect_vec();
+    let p1_ans = possible_obstacle_locations.len();
+
+    let mut p2_ans = 0;
+    for loc in possible_obstacle_locations {
+        if loc == guard_start_pos {
+            continue;
+        }
+        lab[loc.0][loc.1].obstacle = true;
+
+        reset_lab(lab, &mut guard, guard_start_pos);
+        while let Some(step_pos) = try_get_step_pos(lab, &guard) {
+            if do_step(lab, &mut guard, &step_pos) {
+                p2_ans += 1;
+                break;
+            }
+        }
+
+        lab[loc.0][loc.1].obstacle = false;
+    }
+
+    (p1_ans, p2_ans)
+}
+
+fn reset_lab(lab: &mut Map, guard: &mut Guard, guard_start_pos: (usize, usize)) {
+    guard.pos = guard_start_pos;
+    guard.delta = (-1, 0);
+
+    for row in lab.iter_mut() {
+        for cell in row.iter_mut() {
+            cell.visited = false;
+            cell.deltas.clear();
+        }
+    }
+
+    lab[guard.pos.0][guard.pos.1].visited = true;
+    lab[guard.pos.0][guard.pos.1].deltas.push(guard.delta);
+}
+
+fn try_get_step_pos(lab: &Map, guard: &Guard) -> Option<(usize, usize)> {
+    let step_pos = (
+        guard.pos.0 as i32 + guard.delta.0,
+        guard.pos.1 as i32 + guard.delta.1,
+    );
+    if step_pos.0 < 0
+        || step_pos.0 >= lab.len() as i32
+        || step_pos.1 < 0
+        || step_pos.1 >= lab[0].len() as i32
+    {
+        None
+    } else {
+        Some((step_pos.0 as usize, step_pos.1 as usize))
+    }
+}
+
+fn do_step(lab: &mut Map, guard: &mut Guard, step_pos: &(usize, usize)) -> bool {
+    let mut loop_detected = false;
+
+    if lab[step_pos.0][step_pos.1].obstacle {
+        guard.delta = (guard.delta.1, -guard.delta.0);
+    } else {
+        guard.pos = *step_pos;
+    }
+
+    if lab[guard.pos.0][guard.pos.1].visited
+        && lab[guard.pos.0][guard.pos.1].deltas.contains(&guard.delta)
+    {
+        loop_detected = true;
+    }
+
+    lab[guard.pos.0][guard.pos.1].visited = true;
+    lab[guard.pos.0][guard.pos.1].deltas.push(guard.delta);
+
+    loop_detected
+}
+
+fn parse_puzzle_input() -> (Map, (usize, usize)) {
+    let mut guard_start_pos = (0, 0);
+    let mut lab = Vec::new();
+
+    for line in read_lines("input/day_6.txt").unwrap().flatten() {
+        let mut chars = line.chars().collect_vec();
+
+        if let Some(guard_pos) = chars.iter().position(|&c| c == '^') {
+            guard_start_pos.0 = lab.len();
+            guard_start_pos.1 = guard_pos;
+            chars[guard_pos] = '*';
+        }
+
+        lab.push(
+            chars
+                .iter()
+                .map(|&c| Cell {
+                    obstacle: c == '#',
+                    visited: false,
+                    deltas: vec![],
+                })
+                .collect_vec(),
+        )
+    }
+
+    (lab, guard_start_pos)
+}
