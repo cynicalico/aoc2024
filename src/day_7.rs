@@ -1,3 +1,6 @@
+/* https://adventofcode.com/2024/day/7
+ */
+
 use aoc2024::read_lines;
 use itertools::{Either, Itertools};
 
