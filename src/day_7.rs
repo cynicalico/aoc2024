@@ -13,9 +13,9 @@ fn main() {
     let p2_ops = vec![Op::Add, Op::Mul, Op::Cat];
 
     let (p1_checked, p2_checked): (Vec<u64>, Vec<Option<u64>>) =
-        equations.iter().partition_map(|e| {
-            match is_solvable(&p1_ops, e.value, e.numbers[0], &e.numbers[1..]) {
-                None => Either::Right(is_solvable(&p2_ops, e.value, e.numbers[0], &e.numbers[1..])),
+        equations.iter().partition_map(|(value, numbers)| {
+            match is_solvable(&p1_ops, *value, numbers[0], &numbers[1..]) {
+                None => Either::Right(is_solvable(&p2_ops, *value, numbers[0], &numbers[1..])),
                 Some(v) => Either::Left(v),
             }
         });
@@ -26,11 +26,6 @@ fn main() {
     println!("P1: {p1_ans}");
     println!("P2: {p2_ans}");
     println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
-}
-
-struct Equation {
-    value: u64,
-    numbers: Vec<u64>,
 }
 
 enum Op {
@@ -68,19 +63,19 @@ fn is_solvable(ops: &[Op], v: u64, acc: u64, ns: &[u64]) -> Option<u64> {
     }
 }
 
-fn parse_puzzle_input() -> Vec<Equation> {
+fn parse_puzzle_input() -> Vec<(u64, Vec<u64>)> {
     read_lines("input/day_7.txt")
         .unwrap()
         .flatten()
         .map(|line| {
             let (value, numbers) = line.split(": ").collect_tuple().unwrap();
-            Equation {
-                value: value.parse().unwrap(),
-                numbers: numbers
+            (
+                value.parse().unwrap(),
+                numbers
                     .split_whitespace()
                     .map(|n| n.parse().unwrap())
                     .collect_vec(),
-            }
+            )
         })
         .collect_vec()
 }
