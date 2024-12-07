@@ -10,7 +10,7 @@ fn main() {
     let equations = parse_puzzle_input();
 
     let p1_ops = vec![Op::Add, Op::Mul];
-    let p2_ops = vec![Op::Add, Op::Mul, Op::Cat];
+    let p2_ops = vec![Op::Cat, Op::Add, Op::Mul];
 
     let (p1_checked, p2_checked): (Vec<u64>, Vec<Option<u64>>) =
         equations.iter().partition_map(|(value, numbers)| {
@@ -35,7 +35,7 @@ enum Op {
 }
 
 fn is_solvable(ops: &[Op], v: u64, acc: u64, ns: &[u64]) -> Option<u64> {
-    if acc > v || ns.is_empty() {
+    if acc > v {
         None
     } else {
         ops.iter()
