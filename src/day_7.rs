@@ -15,8 +15,8 @@ fn main() {
     let (p1_checked, p2_checked): (Vec<u64>, Vec<Option<u64>>) =
         equations.iter().partition_map(|(value, numbers)| {
             match is_solvable(&p1_ops, *value, numbers[0], &numbers[1..]) {
-                None => Either::Right(is_solvable(&p2_ops, *value, numbers[0], &numbers[1..])),
                 Some(v) => Either::Left(v),
+                None => Either::Right(is_solvable(&p2_ops, *value, numbers[0], &numbers[1..])),
             }
         });
 
@@ -44,14 +44,10 @@ fn is_solvable(ops: &[Op], v: u64, acc: u64, ns: &[u64]) -> Option<u64> {
                 Op::Mul => acc.checked_mul(ns[0]),
                 Op::Cat => {
                     let mut n = ns[0];
-                    (0..=n.ilog10()).rev().try_fold(acc, |acc, i| {
-                        let p = 10u64.pow(i);
-                        let d = n / p;
-                        acc.checked_mul(10).and_then(|mut new_acc| {
-                            new_acc += d;
-                            n -= d * p;
-                            Some(new_acc)
-                        })
+                    (0..=n.ilog10()).rev().try_fold(acc, |cat, i| {
+                        let d = n / 10u64.pow(i);
+                        n -= d * 10u64.pow(i);
+                        cat.checked_mul(10).map(|x| x + d)
                     })
                 }
             })
