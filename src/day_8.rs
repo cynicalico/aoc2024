@@ -13,7 +13,7 @@ fn main() {
 
     println!(
         "P1: {}",
-        calculate_ans(map_w, map_h, &locs, [1i32].into_iter())
+        calculate_ans(map_w, map_h, &locs, std::iter::once(1i32))
     );
     println!("P2: {}", calculate_ans(map_w, map_h, &locs, 0i32..));
     println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
