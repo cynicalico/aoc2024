@@ -1,3 +1,6 @@
+/* https://adventofcode.com/2024/day/8
+ */
+
 use aoc2024::read_lines;
 use itertools::Itertools;
 use std::cmp::max;
