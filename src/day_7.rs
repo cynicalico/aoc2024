@@ -45,7 +45,7 @@ fn is_solvable(ops: &[Op], value: u64, numbers: &[u64]) -> Option<u64> {
                     Op::Mul => acc.checked_mul(numbers[0]),
                     Op::Cat => acc
                         .checked_mul(10u64.pow(numbers[0].ilog10() + 1))
-                        .map(|x| x + numbers[0]),
+                        .and_then(|x| x.checked_add(numbers[0])),
                 })
                 .any(|x| match &numbers[1..] {
                     [] => x == value,
