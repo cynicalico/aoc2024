@@ -43,13 +43,9 @@ fn is_solvable(ops: &[Op], value: u64, numbers: &[u64]) -> Option<u64> {
                 .flat_map(|op| match op {
                     Op::Add => acc.checked_add(numbers[0]),
                     Op::Mul => acc.checked_mul(numbers[0]),
-                    Op::Cat => (0..=numbers[0].ilog10())
-                        .rev()
-                        .try_fold((acc, numbers[0]), |(cat, n), i| {
-                            let d = n / 10u64.pow(i);
-                            cat.checked_mul(10).map(|x| (x + d, n - d * 10u64.pow(i)))
-                        })
-                        .map(|t| t.0),
+                    Op::Cat => acc
+                        .checked_mul(10u64.pow(numbers[0].ilog10() + 1))
+                        .map(|x| x + numbers[0]),
                 })
                 .any(|x| match &numbers[1..] {
                     [] => x == value,
