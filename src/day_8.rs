@@ -3,7 +3,6 @@
 
 use aoc2024::read_lines;
 use itertools::Itertools;
-use std::cmp::max;
 use std::collections::HashMap;
 
 fn main() {
@@ -57,8 +56,8 @@ fn parse_puzzle_input() -> (i32, i32, HashMap<char, Vec<(i32, i32)>>) {
     let mut locs: HashMap<char, Vec<(i32, i32)>> = HashMap::new();
 
     for (y, line) in read_lines("input/day_8.txt").unwrap().flatten().enumerate() {
-        map_h = max(map_h, (y + 1) as i32);
-        map_w = max(map_w, line.len() as i32);
+        map_h = map_h.max(y as i32 + 1);
+        map_w = map_w.max(line.len() as i32);
 
         for (x, c) in line.chars().enumerate().filter(|(_, c)| *c != '.') {
             let pos = (x as i32, y as i32);
