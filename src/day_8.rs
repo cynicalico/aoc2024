@@ -8,57 +8,39 @@ fn main() {
 
     let (map_w, map_h, locs) = parse_puzzle_input();
 
-    println!("P1: {}", calculate_p1_ans(map_w, map_h, &locs));
-    println!("P2: {}", calculate_p2_ans(map_w, map_h, &locs));
+    println!(
+        "P1: {}",
+        calculate_ans(map_w, map_h, &locs, [1i32].into_iter())
+    );
+    println!("P2: {}", calculate_ans(map_w, map_h, &locs, 0i32..));
     println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
-fn calculate_p1_ans(map_w: i32, map_h: i32, locs: &HashMap<char, Vec<(i32, i32)>>) -> usize {
-    locs.iter()
-        .map(|(_, vs)| {
-            vs.iter()
-                .combinations(2)
-                .map(|v| {
-                    vec![
-                        (v[0].0 + (v[0].0 - v[1].0), v[0].1 + (v[0].1 - v[1].1)),
-                        (v[1].0 + (v[1].0 - v[0].0), v[1].1 + (v[1].1 - v[0].1)),
-                    ]
-                })
-                .flatten()
-                .filter(|(x, y)| *x >= 0 && *y >= 0 && *x < map_w && *y < map_h)
-        })
-        .flatten()
-        .unique()
-        .count()
-}
+fn calculate_ans<I>(map_w: i32, map_h: i32, locs: &HashMap<char, Vec<(i32, i32)>>, it: I) -> usize
+where
+    I: Iterator<Item = i32> + Clone,
+{
+    let find_antinodes = |a: (i32, i32), b: (i32, i32)| {
+        let mut antinode_locs = Vec::new();
+        for (p1, p2) in [(a, b), (b, a)] {
+            for i in it.clone() {
+                let x = p1.0 + i * (p1.0 - p2.0);
+                let y = p1.1 + i * (p1.1 - p2.1);
+                if x < 0 || y < 0 || x >= map_w || y >= map_h {
+                    break;
+                } else {
+                    antinode_locs.push((x, y));
+                }
+            }
+        }
+        antinode_locs
+    };
 
-fn calculate_p2_ans(map_w: i32, map_h: i32, locs: &HashMap<char, Vec<(i32, i32)>>) -> usize {
     locs.iter()
         .map(|(_, vs)| {
             vs.iter()
                 .combinations(2)
-                .map(|v| {
-                    let mut antinode_locs: Vec<(i32, i32)> = vec![];
-                    for i in 0.. {
-                        let x = v[0].0 + i * (v[0].0 - v[1].0);
-                        let y = v[0].1 + i * (v[0].1 - v[1].1);
-                        if x < 0 || y < 0 || x >= map_w || y >= map_h {
-                            break;
-                        } else {
-                            antinode_locs.push((x, y));
-                        }
-                    }
-                    for i in 0.. {
-                        let x = v[1].0 + i * (v[1].0 - v[0].0);
-                        let y = v[1].1 + i * (v[1].1 - v[0].1);
-                        if x < 0 || y < 0 || x >= map_w || y >= map_h {
-                            break;
-                        } else {
-                            antinode_locs.push((x, y));
-                        }
-                    }
-                    antinode_locs
-                })
+                .map(|v| find_antinodes(*v[0], *v[1]))
                 .flatten()
         })
         .flatten()
