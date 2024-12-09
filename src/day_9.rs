@@ -61,7 +61,8 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
     }
 
     let mut files_try_moved: HashSet<u32> = HashSet::new();
-    let mut free_spaces = get_all_free_spaces(&disk_map);
+    let mut free_spaces: HashMap<usize, BinaryHeap<Reverse<usize>>> = HashMap::new();
+    let mut disk_map_search_start = 0usize;
 
     let mut file = None;
     loop {
@@ -76,13 +77,22 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
 
                 let filesize = file.1 - file.0;
 
-                if let Some((free_space_size, free_space_start)) = free_spaces
+                let mut valid_free_space = free_spaces
                     .iter()
                     .flat_map(|(size, heap)| heap.peek().map(|s| (*size, s.0)))
                     .filter(|(size, start)| *size >= filesize && *start < file.0)
                     .sorted_by(|a, b| a.1.cmp(&b.1))
-                    .next()
-                {
+                    .next();
+                if valid_free_space.is_none() {
+                    let (new_search_start, free_space_size) =
+                        find_free_spaces(&mut free_spaces, &disk_map, file, disk_map_search_start);
+                    disk_map_search_start = new_search_start;
+                    if let Some(size) = free_space_size {
+                        valid_free_space = free_spaces[&size].peek().map(|s| (size, s.0));
+                    }
+                }
+
+                if let Some((free_space_size, free_space_start)) = valid_free_space {
                     for i in 0..=filesize {
                         disk_map[free_space_start + i] = disk_map[file.0 + i];
                         disk_map[file.0 + i] = None;
@@ -110,9 +120,12 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
     checksum(&disk_map)
 }
 
-fn get_all_free_spaces(disk_map: &[Option<u32>]) -> HashMap<usize, BinaryHeap<Reverse<usize>>> {
-    let mut free_spaces: HashMap<usize, BinaryHeap<Reverse<usize>>> = HashMap::new();
-
+fn find_free_spaces(
+    free_spaces: &mut HashMap<usize, BinaryHeap<Reverse<usize>>>,
+    disk_map: &[Option<u32>],
+    file: (usize, usize),
+    initial_start: usize,
+) -> (usize, Option<usize>) {
     let find_next_free_space = |start: usize| -> Option<(usize, usize)> {
         let mut l = start;
         loop {
@@ -139,9 +152,9 @@ fn get_all_free_spaces(disk_map: &[Option<u32>]) -> HashMap<usize, BinaryHeap<Re
 
     let mut free_space = None;
     loop {
-        free_space = find_next_free_space(free_space.map_or(0, |(_, r)| r + 1));
+        free_space = find_next_free_space(free_space.map_or(initial_start, |(_, r)| r + 1));
         match free_space {
-            None => break,
+            None => break (disk_map.len() - 1, None),
             Some(free_space) => {
                 let size = free_space.1 - free_space.0;
                 if let Some(h) = free_spaces.get_mut(&size) {
@@ -149,11 +162,13 @@ fn get_all_free_spaces(disk_map: &[Option<u32>]) -> HashMap<usize, BinaryHeap<Re
                 } else {
                     free_spaces.insert(size, BinaryHeap::from([Reverse(free_space.0)]));
                 }
+
+                if free_space.0 < file.0 && size >= (file.1 - file.0) {
+                    break (free_space.1 + 1, Some(size));
+                }
             }
         }
     }
-
-    free_spaces
 }
 
 fn checksum(disk_map: &[Option<u32>]) -> u64 {
