@@ -4,7 +4,7 @@
 use aoc2024::read_single_line;
 use itertools::Itertools;
 use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap, HashSet};
+use std::collections::{BinaryHeap, HashMap};
 
 fn main() {
     let start = std::time::Instant::now();
@@ -60,10 +60,10 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
         Some((l + 1, r))
     }
 
-    let mut files_try_moved: HashSet<u32> = HashSet::new();
     let mut free_spaces: HashMap<usize, BinaryHeap<Reverse<usize>>> = HashMap::new();
     let mut disk_map_search_start = 0usize;
 
+    let mut last_moved_file_id = u32::MAX;
     let mut file = None;
     loop {
         file = find_next_file(&disk_map, file.map_or(disk_map.len() - 1, |(l, _)| l - 1));
@@ -71,7 +71,7 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
             None => break,
             Some(file) => {
                 let id = disk_map[file.0].unwrap();
-                if !files_try_moved.insert(id) {
+                if id > last_moved_file_id {
                     continue;
                 }
 
@@ -83,7 +83,7 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
                     .filter(|(size, start)| *size >= filesize && *start < file.0)
                     .sorted_by(|a, b| a.1.cmp(&b.1))
                     .next();
-                if valid_free_space.is_none() {
+                if valid_free_space.is_none() && disk_map_search_start < file.0 {
                     let (new_search_start, free_space_size) =
                         find_free_spaces(&mut free_spaces, &disk_map, file, disk_map_search_start);
                     disk_map_search_start = new_search_start;
@@ -97,6 +97,7 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
                         disk_map[free_space_start + i] = disk_map[file.0 + i];
                         disk_map[file.0 + i] = None;
                     }
+                    last_moved_file_id = id;
 
                     // Remove the one we chose
                     free_spaces.get_mut(&free_space_size).unwrap().pop();
