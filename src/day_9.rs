@@ -3,6 +3,8 @@
 
 use aoc2024::read_single_line;
 use itertools::Itertools;
+use std::cmp::Reverse;
+use std::collections::{BinaryHeap, HashMap, HashSet};
 
 fn main() {
     let start = std::time::Instant::now();
@@ -31,30 +33,6 @@ fn calculate_p1_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
 }
 
 fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
-    fn find_next_free_space(disk_map: &[Option<u32>], start: usize) -> Option<(usize, usize)> {
-        let mut l = start;
-        loop {
-            match disk_map.get(l) {
-                None => return None,
-                Some(Some(_)) => {
-                    l += 1;
-                }
-                Some(None) => break,
-            }
-        }
-        let mut r = l;
-        loop {
-            match disk_map.get(r) {
-                None => break,
-                Some(Some(_)) => break,
-                Some(None) => {
-                    r += 1;
-                }
-            }
-        }
-        Some((l, r - 1))
-    }
-
     fn find_next_file(disk_map: &[Option<u32>], start: usize) -> Option<(usize, usize)> {
         let mut r = start;
         loop {
@@ -82,39 +60,100 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
         Some((l + 1, r))
     }
 
-    fn move_file(disk_map: &mut [Option<u32>], file: (usize, usize), free_space: (usize, usize)) {
-        for i in 0..=(file.1 - file.0) {
-            disk_map[free_space.0 + i] = disk_map[file.0 + i];
-            disk_map[file.0 + i] = None;
-        }
-    }
+    let mut files_try_moved: HashSet<u32> = HashSet::new();
+    let mut free_spaces = get_all_free_spaces(&disk_map);
 
-    let mut file = find_next_file(&disk_map, disk_map.len() - 1);
+    let mut file = None;
     loop {
+        file = find_next_file(&disk_map, file.map_or(disk_map.len() - 1, |(l, _)| l - 1));
         match file {
             None => break,
             Some(file) => {
-                let mut free_space = find_next_free_space(&disk_map, 0);
-                loop {
-                    match free_space {
-                        None => break,
-                        Some(free_space) => {
-                            if file.0 < free_space.0 {
-                                break;
-                            }
-                            if (free_space.1 - free_space.0) >= (file.1 - file.0) {
-                                move_file(&mut disk_map, file, free_space);
-                            }
+                let id = disk_map[file.0].unwrap();
+                if !files_try_moved.insert(id) {
+                    continue;
+                }
+
+                let filesize = file.1 - file.0;
+
+                if let Some((free_space_size, free_space_start)) = free_spaces
+                    .iter()
+                    .flat_map(|(size, heap)| heap.peek().map(|s| (*size, s.0)))
+                    .filter(|(size, start)| *size >= filesize && *start < file.0)
+                    .sorted_by(|a, b| a.1.cmp(&b.1))
+                    .next()
+                {
+                    for i in 0..=filesize {
+                        disk_map[free_space_start + i] = disk_map[file.0 + i];
+                        disk_map[file.0 + i] = None;
+                    }
+
+                    // Remove the one we chose
+                    free_spaces.get_mut(&free_space_size).unwrap().pop();
+
+                    if free_space_size > filesize {
+                        let new_size = free_space_size - filesize - 1;
+                        if let Some(h) = free_spaces.get_mut(&new_size) {
+                            h.push(Reverse(free_space_start + filesize + 1));
+                        } else {
+                            free_spaces.insert(
+                                new_size,
+                                BinaryHeap::from([Reverse(free_space_start + filesize + 1)]),
+                            );
                         }
                     }
-                    free_space = find_next_free_space(&disk_map, free_space.unwrap().1 + 1);
                 }
             }
         }
-        file = find_next_file(&disk_map, file.unwrap().0 - 1);
     }
 
     checksum(&disk_map)
+}
+
+fn get_all_free_spaces(disk_map: &[Option<u32>]) -> HashMap<usize, BinaryHeap<Reverse<usize>>> {
+    let mut free_spaces: HashMap<usize, BinaryHeap<Reverse<usize>>> = HashMap::new();
+
+    let find_next_free_space = |start: usize| -> Option<(usize, usize)> {
+        let mut l = start;
+        loop {
+            match disk_map.get(l) {
+                None => return None,
+                Some(Some(_)) => {
+                    l += 1;
+                }
+                Some(None) => break,
+            }
+        }
+        let mut r = l;
+        loop {
+            match disk_map.get(r) {
+                None => break,
+                Some(Some(_)) => break,
+                Some(None) => {
+                    r += 1;
+                }
+            }
+        }
+        Some((l, r - 1))
+    };
+
+    let mut free_space = None;
+    loop {
+        free_space = find_next_free_space(free_space.map_or(0, |(_, r)| r + 1));
+        match free_space {
+            None => break,
+            Some(free_space) => {
+                let size = free_space.1 - free_space.0;
+                if let Some(h) = free_spaces.get_mut(&size) {
+                    h.push(Reverse(free_space.0));
+                } else {
+                    free_spaces.insert(size, BinaryHeap::from([Reverse(free_space.0)]));
+                }
+            }
+        }
+    }
+
+    free_spaces
 }
 
 fn checksum(disk_map: &[Option<u32>]) -> u64 {
