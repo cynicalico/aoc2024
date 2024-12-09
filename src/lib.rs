@@ -10,6 +10,16 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
+pub fn read_single_line<P>(filename: P) -> io::Result<String>
+where
+    P: AsRef<Path>,
+{
+    let file = File::open(filename)?;
+    let mut buf = String::new();
+    io::BufReader::new(file).read_line(&mut buf)?;
+    Ok(buf.trim_end().to_owned())
+}
+
 pub fn read_lines_partitioned<P, F1, F2>(filename: P, mut f1: F1, mut f2: F2) -> io::Result<()>
 where
     P: AsRef<Path>,
