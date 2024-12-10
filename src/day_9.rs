@@ -33,8 +33,13 @@ fn calculate_p1_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
 }
 
 fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
-    fn find_next_file(disk_map: &[Option<u32>], start: usize) -> Option<(usize, usize)> {
-        let mut r = start;
+    fn find_next_file(disk_map: &[Option<u32>], start: Option<usize>) -> Option<(usize, usize)> {
+        let mut r;
+        if let Some(start) = start {
+            r = start;
+        } else {
+            return None;
+        }
         loop {
             match disk_map.get(r) {
                 None => return None,
@@ -47,17 +52,22 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
         let mut l = r;
         loop {
             match disk_map.get(l) {
-                None => break,
+                None => break None,
                 Some(Some(v)) => {
                     if *v != disk_map[r].unwrap() {
-                        break;
+                        break Some((l + 1, r));
                     }
-                    l -= 1;
+                    match l.checked_sub(1) {
+                        None => break Some((l, r)),
+                        Some(lm1) => {
+                            l = lm1;
+                        }
+                    }
                 }
-                Some(None) => break,
+                Some(None) => break None,
             }
         }
-        Some((l + 1, r))
+        .or(Some((l + 1, r)))
     }
 
     let mut free_spaces: HashMap<usize, BinaryHeap<Reverse<usize>>> = HashMap::new();
@@ -66,7 +76,12 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
     let mut last_moved_file_id = u32::MAX;
     let mut file = None;
     loop {
-        file = find_next_file(&disk_map, file.map_or(disk_map.len() - 1, |(l, _)| l - 1));
+        file = find_next_file(
+            &disk_map,
+            file.map_or(Some(disk_map.len() - 1), |(l, _): (usize, _)| {
+                l.checked_sub(1)
+            }),
+        );
         match file {
             None => break,
             Some(file) => {

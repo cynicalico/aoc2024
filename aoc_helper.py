@@ -2,14 +2,32 @@ import argparse
 import datetime
 import os
 
-import browser_cookie3
 import requests
 
 
+def get_cookies():
+    cookies = {}
+    try:
+        with open('.session', 'r') as f:
+            cookies['session'] = f.read().rstrip()
+    except FileNotFoundError:
+        print("Failed to open file: '.session'!")
+        print("Please create a file in this directory named '.session' and copy your AoC session cookie into it.")
+
+    return cookies
+
+
 def dl(args):
+    cookies = get_cookies()
+    if len(cookies) == 0:
+        return
+
     os.makedirs(args.dir, exist_ok=True)
-    r = requests.get(f"https://adventofcode.com/2024/day/{args.day}/input",
-                     cookies=browser_cookie3.load('adventofcode.com'))
+    r = requests.get(f"https://adventofcode.com/2024/day/{args.day}/input", cookies=cookies)
+
+    if r.status_code == 400:
+        print("Session cookie was invalid, check .session")
+        return
 
     filename = os.path.join(args.dir, f'day_{args.day}.txt')
     with open(filename, 'w') as f:
