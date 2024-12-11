@@ -2,29 +2,29 @@
  */
 
 use aoc2024::{ds::Graph, get_neighbors_4, read_lines};
+use hashlink::LinkedHashSet;
 use itertools::Itertools;
+use std::collections::HashSet;
 
 fn main() {
     let start = std::time::Instant::now();
 
     let map = parse_puzzle_input();
 
-    println!("P1: {}", calculate_p1_ans(&map));
-    println!("P2: {}", calculate_p2_ans(&map));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
-}
+    let trailheads = map
+        .iter()
+        .enumerate()
+        .flat_map(|(r, row)| {
+            row.iter()
+                .enumerate()
+                .filter_map(move |(c, v)| (*v == 0).then_some((r, c)))
+        })
+        .collect_vec();
 
-fn calculate_p1_ans(map: &Vec<Vec<i32>>) -> i32 {
-    get_trailheads(map)
-        .into_iter()
-        .map(|start| dfs_score(&map, start))
-        .sum()
-}
-
-fn calculate_p2_ans(map: &Vec<Vec<i32>>) -> i32 {
-    let mut graph = Graph::new();
+    let mut graph = G::new();
     for y in 0..map.len() {
         for x in 0..map[y].len() {
+            graph.add_node((y, x), map[y][x]);
             for neighbor in get_neighbors_4((y, x), map.len(), map[y].len())
                 .into_iter()
                 .filter(|(ny, nx)| map[*ny][*nx] == map[y][x] + 1)
@@ -34,42 +34,41 @@ fn calculate_p2_ans(map: &Vec<Vec<i32>>) -> i32 {
         }
     }
 
-    let trailheads = get_trailheads(map);
-
-    0
+    println!("P1: {}", calculate_p1_ans(&graph, &trailheads));
+    println!("P2: {}", calculate_p2_ans(&graph, &trailheads));
+    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
 }
 
-fn get_trailheads(map: &Vec<Vec<i32>>) -> Vec<(usize, usize)> {
-    map.iter()
-        .enumerate()
-        .flat_map(|(r, row)| {
-            row.iter()
-                .enumerate()
-                .filter(|(_, v)| **v == 0)
-                .map(|(c, _)| (r, c))
-                .collect_vec()
-        })
-        .collect_vec()
+type G = Graph<(usize, usize), i32>;
+
+fn calculate_p1_ans(graph: &G, trailheads: &[(usize, usize)]) -> u32 {
+    trailheads
+        .iter()
+        .map(|start| score_trailhead(graph, start))
+        .sum()
 }
 
-fn dfs_score(map: &Vec<Vec<i32>>, start: (usize, usize)) -> i32 {
+fn calculate_p2_ans(graph: &G, trailheads: &[(usize, usize)]) -> u32 {
+    trailheads.iter().map(|start| rate_path(graph, start)).sum()
+}
+
+fn score_trailhead(graph: &G, start: &(usize, usize)) -> u32 {
     let mut score = 0;
-    let mut visited: Vec<Vec<bool>> = vec![vec![false; map[0].len()]; map.len()];
+    let mut visited: HashSet<(usize, usize)> = HashSet::new();
 
-    let mut stack: Vec<(usize, usize)> = Vec::from([start]);
+    let mut stack: Vec<(usize, usize)> = Vec::from([*start]);
     while !stack.is_empty() {
         let v = stack.pop().unwrap();
-        if !visited[v.0][v.1] {
-            visited[v.0][v.1] = true;
+        if !visited.contains(&v) {
+            visited.insert(v);
 
-            if map[v.0][v.1] == 9 {
+            if graph.val(&v).unwrap() == &9 {
                 score += 1;
             } else {
-                for neighbor in get_neighbors_4(v, map.len(), map[0].len())
-                    .into_iter()
-                    .filter(|(y, x)| map[*y][*x] == map[v.0][v.1] + 1)
-                {
-                    stack.push(neighbor);
+                if let Some(neighbors) = graph.adj(&v) {
+                    for n in neighbors {
+                        stack.push(*n);
+                    }
                 }
             }
         }
@@ -78,8 +77,38 @@ fn dfs_score(map: &Vec<Vec<i32>>, start: (usize, usize)) -> i32 {
     score
 }
 
+fn rate_path(graph: &G, start: &(usize, usize)) -> u32 {
+    fn inner(graph: &G, visited: &mut LinkedHashSet<(usize, usize)>, rating: &mut u32) {
+        if let Some(adj) = graph.adj(visited.back().unwrap()) {
+            for n in adj {
+                if visited.contains(n) {
+                    continue;
+                }
+                if graph.val(n).unwrap() == &9 {
+                    *rating += 1;
+                }
+            }
+            for n in adj {
+                if visited.contains(n) || graph.val(n).unwrap() == &9 {
+                    continue;
+                }
+                visited.insert(*n);
+                inner(graph, visited, rating);
+                visited.pop_back();
+            }
+        }
+    }
+
+    let mut visited = LinkedHashSet::new();
+    visited.insert(*start);
+    let mut rating = 0;
+    inner(graph, &mut visited, &mut rating);
+
+    rating
+}
+
 fn parse_puzzle_input() -> Vec<Vec<i32>> {
-    read_lines("input/example/day_10.txt")
+    read_lines("input/day_10.txt")
         .expect("Failed to open input file")
         .flatten()
         .map(|line| {

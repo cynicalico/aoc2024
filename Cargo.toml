@@ -45,4 +45,5 @@ path = "src/day_10.rs"
 
 [dependencies]
 itertools = "0.13.0"
+hashlink = "0.10.0"
 regex = "1.11.1"
