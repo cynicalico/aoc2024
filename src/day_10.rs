@@ -87,11 +87,6 @@ fn rate_path(graph: &G, start: &(usize, usize)) -> u32 {
                 if graph.val(n).unwrap() == &9 {
                     *rating += 1;
                 }
-            }
-            for n in adj {
-                if visited.contains(n) || graph.val(n).unwrap() == &9 {
-                    continue;
-                }
                 visited.insert(*n);
                 inner(graph, visited, rating);
                 visited.pop_back();
