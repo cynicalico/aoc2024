@@ -21,14 +21,14 @@ fn calculate_p1_ans(stone_counts: &mut HashMap<u64, usize>) -> usize {
     for _ in 0..25 {
         blink(stone_counts);
     }
-    stone_counts.iter().map(|(_, v)| v).sum()
+    stone_counts.values().sum()
 }
 
 fn calculate_p2_ans(stone_counts: &mut HashMap<u64, usize>) -> usize {
     for _ in 0..50 {
         blink(stone_counts);
     }
-    stone_counts.iter().map(|(_, v)| v).sum()
+    stone_counts.values().sum()
 }
 
 fn blink(stone_counts: &mut HashMap<u64, usize>) {
