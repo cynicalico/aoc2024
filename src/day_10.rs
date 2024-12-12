@@ -11,19 +11,15 @@ fn main() {
 
     let map = parse_puzzle_input();
 
-    let trailheads = map
-        .iter()
-        .enumerate()
-        .flat_map(|(r, row)| {
-            row.iter()
-                .enumerate()
-                .filter_map(move |(c, v)| (*v == 0).then_some((r, c)))
-        })
-        .collect_vec();
-
+    let mut trailheads: Vec<(usize, usize)> = Vec::new();
     let mut graph = G::new();
+
     for y in 0..map.len() {
         for x in 0..map[y].len() {
+            if map[y][x] == 0 {
+                trailheads.push((y, x));
+            }
+
             graph.add_node((y, x), map[y][x]);
             for neighbor in get_neighbors_4((y, x), map.len(), map[y].len())
                 .into_iter()
@@ -59,9 +55,7 @@ fn score_trailhead(graph: &G, start: &(usize, usize)) -> u32 {
     let mut stack: Vec<(usize, usize)> = Vec::from([*start]);
     while !stack.is_empty() {
         let v = stack.pop().unwrap();
-        if !visited.contains(&v) {
-            visited.insert(v);
-
+        if visited.insert(v) {
             if graph.val(&v).unwrap() == &9 {
                 score += 1;
             } else {
