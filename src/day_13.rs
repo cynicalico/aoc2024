@@ -18,8 +18,9 @@ fn main() {
 }
 
 fn solve_system(xs: &[i64], c: i64) -> Option<i64> {
-    let x = ((xs[4] + c) * xs[3] - xs[2] * (xs[5] + c)) / (xs[0] * xs[3] - xs[2] * xs[1]);
-    let y = (xs[0] * (xs[5] + c) - (xs[4] + c) * xs[1]) / (xs[0] * xs[3] - xs[2] * xs[1]);
+    let d = xs[0] * xs[3] - xs[2] * xs[1];
+    let x = ((xs[4] + c) * xs[3] - xs[2] * (xs[5] + c)) / d;
+    let y = (xs[0] * (xs[5] + c) - (xs[4] + c) * xs[1]) / d;
     (xs[0] * x + xs[2] * y == xs[4] + c && xs[1] * x + xs[3] * y == xs[5] + c).then_some(x * 3 + y)
 }
 
