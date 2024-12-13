@@ -191,10 +191,7 @@ fn checksum(disk_map: &[Option<u32>]) -> u64 {
     disk_map
         .iter()
         .enumerate()
-        .map(|(idx, o)| match o {
-            None => 0,
-            Some(v) => (idx as u64) * (*v as u64),
-        })
+        .flat_map(|(idx, o)| o.map(|v| (idx as u64) * (v as u64)))
         .sum()
 }
 
