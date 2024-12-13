@@ -1,9 +1,19 @@
 use itertools::Itertools;
 use std::fs::File;
-use std::io::{self, BufRead};
+use std::io::{self, BufRead, Read};
 use std::path::Path;
 
 pub mod ds;
+
+pub fn read<P>(filename: P) -> io::Result<String>
+where
+    P: AsRef<Path>,
+{
+    let mut file = File::open(filename)?;
+    let mut buf = String::new();
+    file.read_to_string(&mut buf)?;
+    Ok(buf)
+}
 
 pub fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
