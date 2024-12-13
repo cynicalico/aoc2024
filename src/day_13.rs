@@ -25,18 +25,11 @@ fn calculate_p1_ans(machines: &[((i64, i64), (i64, i64), (i64, i64))]) -> i64 {
 fn calculate_p2_ans(machines: &[((i64, i64), (i64, i64), (i64, i64))]) -> i64 {
     machines
         .into_iter()
-        .flat_map(|(a, b, c)| solve_system_translated(a, b, c))
+        .flat_map(|(a, b, c)| solve_system(a, b, &(c.0 + 10000000000000, c.1 + 10000000000000)))
         .sum()
 }
 
 fn solve_system(a: &(i64, i64), b: &(i64, i64), c: &(i64, i64)) -> Option<i64> {
-    let x = (c.0 * b.1 - b.0 * c.1) as f64 / (a.0 * b.1 - b.0 * a.1) as f64;
-    let y = (a.0 * c.1 - c.0 * a.1) as f64 / (a.0 * b.1 - b.0 * a.1) as f64;
-    (x.fract() == 0.0 && y.fract() == 0.0).then_some((x * 3.0 + y) as i64)
-}
-
-fn solve_system_translated(a: &(i64, i64), b: &(i64, i64), c: &(i64, i64)) -> Option<i64> {
-    let c = (c.0 + 10000000000000, c.1 + 10000000000000);
     let x = (c.0 * b.1 - b.0 * c.1) as f64 / (a.0 * b.1 - b.0 * a.1) as f64;
     let y = (a.0 * c.1 - c.0 * a.1) as f64 / (a.0 * b.1 - b.0 * a.1) as f64;
     (x.fract() == 0.0 && y.fract() == 0.0).then_some((x * 3.0 + y) as i64)
