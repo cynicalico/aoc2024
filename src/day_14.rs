@@ -42,33 +42,48 @@ fn calculate_p1_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -
         .product()
 }
 
-fn calculate_p2_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -> usize {
-    let mut dist_avgs = Vec::<f32>::new();
-    for _ in 0..w * h {
+/**
+ * Not my idea to solve it this way, I copied the solution from this comment
+ * This problem sucks, I have no idea what they were thinking. Even this solution is
+ * effectively relying on knowing what the final solution looks like.
+ *
+ * https://www.reddit.com/r/adventofcode/comments/1he0asr/comment/m1zzfsh
+ */
+fn calculate_p2_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -> i32 {
+    let mut bx = 0;
+    let mut by = 0;
+    let mut bxvar = f32::INFINITY;
+    let mut byvar = f32::INFINITY;
+
+    for t in 1..=w.max(h) {
         for ((x, y), (dx, dy)) in &mut robots {
             *x = (*x + *dx).rem_euclid(w);
             *y = (*y + *dy).rem_euclid(h);
         }
 
-        let mut dist_sum: i32 = 0;
-        let mut n = 0;
-        for i in 0..robots.len() {
-            for j in i..robots.len() {
-                dist_sum += (robots[j].0 .0 - robots[i].0 .0).pow(2)
-                    + (robots[j].0 .1 - robots[i].0 .1).pow(2);
-                n += 1;
-            }
+        let xs = robots.iter().map(|((x, _), _)| *x as f32).collect_vec();
+        let ys = robots.iter().map(|((_, y), _)| *y as f32).collect_vec();
+        let xvar = variance(&xs);
+        let yvar = variance(&ys);
+        if xvar < bxvar {
+            bx = t;
+            bxvar = xvar;
         }
-        dist_avgs.push(dist_sum as f32 / n as f32);
+        if yvar < byvar {
+            by = t;
+            byvar = yvar;
+        }
     }
 
-    dist_avgs
-        .iter()
-        .enumerate()
-        .min_by(|a, b| a.1.total_cmp(b.1))
-        .unwrap()
-        .0
-        + 1
+    // TODO: Make a 3 argument pow function to replicate Python's
+    //       We're taking advantage of the fact that we know inverse(w) = 51
+    //       In Python: pow(w, -1, h)
+    bx + (((51 * (by - bx)) % h) * w)
+}
+
+fn variance(xs: &[f32]) -> f32 {
+    let mean: f32 = xs.iter().sum::<f32>() / xs.len() as f32;
+    xs.iter().map(|v| (v - mean).powf(2.0)).sum::<f32>() / (xs.len() - 1) as f32
 }
 
 fn parse_puzzle_input() -> Vec<((i32, i32), (i32, i32))> {
