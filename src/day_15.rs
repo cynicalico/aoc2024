@@ -68,6 +68,8 @@ fn move_robot(warehouse: &mut Warehouse, robot_start_pos: Pos, moves: &[Move]) {
         for _ in 0..*n {
             if let Some((y, x)) = try_push(warehouse, robot_pos, d) {
                 robot_pos = (y, x);
+            } else {
+                break;
             }
         }
     }
