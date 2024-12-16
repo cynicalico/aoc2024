@@ -59,7 +59,12 @@ path = "src/day_13.rs"
 name = "day_14"
 path = "src/day_14.rs"
 
+[[bin]]
+name = "day_15"
+path = "src/day_15.rs"
+
 [dependencies]
 itertools = "0.13.0"
 hashlink = "0.10.0"
 regex = "1.11.1"
+termcolor = "1.4.1"
