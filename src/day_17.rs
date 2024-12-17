@@ -6,17 +6,24 @@ use regex::Regex;
 fn main() {
     let start_time = std::time::Instant::now();
 
-    let (mut regs, prog) = parse_puzzle_input();
+    let (mut regs, prog, quine) = parse_puzzle_input();
 
-    println!("P1: {}", execute(&mut regs, &prog));
+    println!("P1: {}", execute(&mut regs, &prog).iter().join(","));
+    println!("P2: {:?}", find_a_quine(&prog, quine));
     println!("Took {:.04}s", start_time.elapsed().as_nanos() as f64 / 1e9);
 }
 
 #[derive(Debug)]
 struct Registers {
-    a: u32,
-    b: u32,
-    c: u32,
+    a: u64,
+    b: u64,
+    c: u64,
+}
+
+impl Registers {
+    pub fn new(a: u64) -> Self {
+        Self { a, b: 0, c: 0 }
+    }
 }
 
 #[derive(Debug)]
@@ -31,8 +38,8 @@ enum Opcode {
     CDV,
 }
 
-impl From<u32> for Opcode {
-    fn from(value: u32) -> Self {
+impl From<u64> for Opcode {
+    fn from(value: u64) -> Self {
         match value {
             0 => Opcode::ADV,
             1 => Opcode::BXL,
@@ -47,10 +54,10 @@ impl From<u32> for Opcode {
     }
 }
 
-type Program = Vec<(Opcode, u32)>;
+type Program = Vec<(Opcode, u64)>;
 
-fn execute(regs: &mut Registers, prog: &Program) -> String {
-    let mut output = "".to_owned();
+fn execute(regs: &mut Registers, prog: &Program) -> Vec<u32> {
+    let mut output = Vec::new();
     let mut ip = 0;
 
     while ip < prog.len() {
@@ -66,12 +73,7 @@ fn execute(regs: &mut Registers, prog: &Program) -> String {
                 }
             }
             Opcode::BXC => regs.b ^= regs.c,
-            Opcode::OUT => {
-                if !output.is_empty() {
-                    output += ",";
-                }
-                output += (combo(regs, *operand) % 8).to_string().as_str();
-            }
+            Opcode::OUT => output.push((combo(regs, *operand) % 8) as u32),
             Opcode::BDV => regs.b = regs.a >> combo(regs, *operand),
             Opcode::CDV => regs.c = regs.a >> combo(regs, *operand),
         }
@@ -81,7 +83,7 @@ fn execute(regs: &mut Registers, prog: &Program) -> String {
     output
 }
 
-fn combo(regs: &Registers, operand: u32) -> u32 {
+fn combo(regs: &Registers, operand: u64) -> u64 {
     match operand {
         0 => 0,
         1 => 1,
@@ -94,9 +96,47 @@ fn combo(regs: &Registers, operand: u32) -> u32 {
     }
 }
 
-fn parse_puzzle_input() -> (Registers, Program) {
+fn find_a_quine(prog: &Program, quine: String) -> u64 {
+    println!("                                 {quine}");
+    let quine_v: Vec<u32> = quine
+        .split(',')
+        .map(|n| n.parse::<u32>().unwrap())
+        .collect();
+    let width = quine.len();
+
+    let mut regs = Registers::new(0);
+
+    let mut a = 0;
+    loop {
+        let t = std::time::Instant::now();
+        loop {
+            regs.a = a;
+            regs.b = 0;
+            regs.c = 0;
+            let output_v = execute(&mut regs, prog);
+            if output_v == quine_v[quine_v.len() - output_v.len()..] {
+                let output = output_v.iter().join(",");
+                println!(
+                    "\rFOUND   {a:<22o}   {output:>width$}   {:.04}s",
+                    t.elapsed().as_nanos() as f64 / 1e9
+                );
+
+                if output_v.len() == quine_v.len() {
+                    return a;
+                } else {
+                    break;
+                }
+            }
+            a += 1;
+        }
+        a <<= 3;
+    }
+}
+
+fn parse_puzzle_input() -> (Registers, Program, String) {
     let mut regs = Registers { a: 0, b: 0, c: 0 };
     let mut prog = Program::new();
+    let mut quine = String::new();
 
     let re = Regex::new(r"Register ([ABC]): (\d+)|(Program): ((?:\d+,\d+,?)+)$").unwrap();
     let _ = read_lines("input/day_17.txt")
@@ -110,7 +150,8 @@ fn parse_puzzle_input() -> (Registers, Program) {
                 "B" => regs.b = v.parse().unwrap(),
                 "C" => regs.c = v.parse().unwrap(),
                 "Program" => {
-                    for chunk in &v.split(',').map(|n| n.parse::<u32>().unwrap()).chunks(2) {
+                    quine = v.to_string(); // Need this to compare to the output for part 2
+                    for chunk in &v.split(',').map(|n| n.parse::<u64>().unwrap()).chunks(2) {
                         let (opcode, operand) = chunk.collect_tuple().unwrap();
                         prog.push((opcode.into(), operand));
                     }
@@ -119,5 +160,5 @@ fn parse_puzzle_input() -> (Registers, Program) {
             }
         });
 
-    (regs, prog)
+    (regs, prog, quine)
 }
