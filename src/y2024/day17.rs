@@ -1,33 +1,17 @@
-use aoc2024::read_lines;
+use crate::util::io::read_lines;
 use itertools::Itertools;
 use regex::Regex;
-
-/** https://adventofcode.com/2024/day/17 */
-fn main() {
-    let start_time = std::time::Instant::now();
-
-    let (mut regs, prog, quine) = parse_puzzle_input();
-
-    println!("P1: {}", execute(&mut regs, &prog).iter().join(","));
-    println!("P2: {:?}", find_a_quine(&prog, &quine));
-    println!("Took {:.06}s", start_time.elapsed().as_nanos() as f64 / 1e9);
-}
+use std::io;
 
 #[derive(Debug)]
-struct Registers {
+pub struct Registers {
     a: u64,
     b: u64,
     c: u64,
 }
 
-impl Registers {
-    pub fn new(a: u64) -> Self {
-        Self { a, b: 0, c: 0 }
-    }
-}
-
 #[derive(Debug)]
-enum Opcode {
+pub enum Opcode {
     ADV,
     BXL,
     BST,
@@ -36,6 +20,59 @@ enum Opcode {
     OUT,
     BDV,
     CDV,
+}
+
+type Program = Vec<(Opcode, u64)>;
+
+type Input = (Registers, Program, Vec<u64>);
+
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let mut regs = Registers::new(0);
+    let mut prog = Program::new();
+    let mut quine = Vec::new();
+
+    let re = Regex::new(r"Register ([ABC]): (\d+)|(Program): ((?:\d+,\d+,?)+)$").unwrap();
+    let _ = read_lines(filepath)?
+        .flatten()
+        .filter(|line| !line.is_empty())
+        .for_each(|line| {
+            let (_, [k, v]) = re.captures(&line).map(|c| c.extract()).unwrap();
+            match k {
+                "A" => regs.a = v.parse().unwrap(),
+                "B" => regs.b = v.parse().unwrap(),
+                "C" => regs.c = v.parse().unwrap(),
+                "Program" => {
+                    quine = v.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
+                    for chunk in quine.chunks_exact(2) {
+                        let [opcode, operand] = chunk else {
+                            unreachable!()
+                        };
+                        prog.push(((*opcode).into(), *operand));
+                    }
+                }
+                _ => unreachable!(),
+            }
+        });
+
+    Ok((regs, prog, quine))
+}
+
+pub fn part1(input: &Input) -> Option<String> {
+    Some(
+        execute(&mut Registers::new(input.0.a), &input.1)
+            .iter()
+            .join(","),
+    )
+}
+
+pub fn part2(input: &Input) -> Option<u64> {
+    Some(find_a_quine(&input.1, &input.2))
+}
+
+impl Registers {
+    pub fn new(a: u64) -> Self {
+        Self { a, b: 0, c: 0 }
+    }
 }
 
 impl From<u64> for Opcode {
@@ -53,8 +90,6 @@ impl From<u64> for Opcode {
         }
     }
 }
-
-type Program = Vec<(Opcode, u64)>;
 
 fn execute(regs: &mut Registers, prog: &Program) -> Vec<u64> {
     let mut output = Vec::new();
@@ -114,36 +149,4 @@ fn find_a_quine(prog: &Program, quine: &Vec<u64>) -> u64 {
         }
         starts = new_starts.into_iter().map(|a| a << 3).collect();
     }
-}
-
-fn parse_puzzle_input() -> (Registers, Program, Vec<u64>) {
-    let mut regs = Registers { a: 0, b: 0, c: 0 };
-    let mut prog = Program::new();
-    let mut quine = Vec::new();
-
-    let re = Regex::new(r"Register ([ABC]): (\d+)|(Program): ((?:\d+,\d+,?)+)$").unwrap();
-    let _ = read_lines("input/day_17.txt")
-        .expect("Failed to open input file")
-        .flatten()
-        .filter(|line| !line.is_empty())
-        .for_each(|line| {
-            let (_, [k, v]) = re.captures(&line).map(|c| c.extract()).unwrap();
-            match k {
-                "A" => regs.a = v.parse().unwrap(),
-                "B" => regs.b = v.parse().unwrap(),
-                "C" => regs.c = v.parse().unwrap(),
-                "Program" => {
-                    quine = v.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
-                    for chunk in quine.chunks_exact(2) {
-                        let [opcode, operand] = chunk else {
-                            unreachable!()
-                        };
-                        prog.push(((*opcode).into(), *operand));
-                    }
-                }
-                _ => unreachable!(),
-            }
-        });
-
-    (regs, prog, quine)
 }

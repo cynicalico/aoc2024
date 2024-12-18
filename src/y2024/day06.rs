@@ -1,18 +1,39 @@
-/* https://adventofcode.com/2024/day/6
- */
-
-use aoc2024::read_lines;
+use crate::util::io::read_lines;
 use itertools::Itertools;
+use std::io;
 
-fn main() {
-    let start = std::time::Instant::now();
+type Input = (usize, u32);
 
-    let (mut lab, guard_start_pos) = parse_puzzle_input();
-    let (p1_ans, p2_ans) = calculate_ans(&mut lab, guard_start_pos);
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let mut guard_start_pos = (0, 0);
+    let mut lab = Vec::new();
 
-    println!("P1: {p1_ans}");
-    println!("P2: {p2_ans}");
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+    for line in read_lines(filepath)?.flatten() {
+        let chars = line.chars();
+
+        if let Some(guard_pos) = chars.clone().position(|c| c == '^') {
+            guard_start_pos = (lab.len(), guard_pos);
+        }
+
+        lab.push(
+            chars
+                .map(|c| Cell {
+                    obstacle: c == '#',
+                    visited_deltas: vec![],
+                })
+                .collect_vec(),
+        )
+    }
+
+    Ok(calculate_ans(&mut lab, guard_start_pos))
+}
+
+pub fn part1(input: &Input) -> Option<usize> {
+    Some(input.0)
+}
+
+pub fn part2(input: &Input) -> Option<u32> {
+    Some(input.1)
 }
 
 struct Cell {
@@ -119,28 +140,4 @@ fn do_step(lab: &mut Map, guard: &mut Guard, step_pos: &(usize, usize)) -> bool 
         .push(guard.delta);
 
     loop_detected
-}
-
-fn parse_puzzle_input() -> (Map, (usize, usize)) {
-    let mut guard_start_pos = (0, 0);
-    let mut lab = Vec::new();
-
-    for line in read_lines("input/day_6.txt").unwrap().flatten() {
-        let chars = line.chars();
-
-        if let Some(guard_pos) = chars.clone().position(|c| c == '^') {
-            guard_start_pos = (lab.len(), guard_pos);
-        }
-
-        lab.push(
-            chars
-                .map(|c| Cell {
-                    obstacle: c == '#',
-                    visited_deltas: vec![],
-                })
-                .collect_vec(),
-        )
-    }
-
-    (lab, guard_start_pos)
 }

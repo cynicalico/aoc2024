@@ -1,15 +1,18 @@
-/* https://adventofcode.com/2024/day/10
- */
-
-use aoc2024::{ds::Graph, get_neighbors_4, read_lines};
+use crate::util::graph::Graph;
+use crate::util::grid::get_neighbors_4;
+use crate::util::io::read_lines;
 use hashlink::LinkedHashSet;
-use itertools::Itertools;
 use std::collections::HashSet;
+use std::io;
 
-fn main() {
-    let start = std::time::Instant::now();
+type G = Graph<(usize, usize), u32>;
+type Input = (G, Vec<(usize, usize)>);
 
-    let map = parse_puzzle_input();
+pub fn parse(filename: &str) -> io::Result<Input> {
+    let map: Vec<Vec<u32>> = read_lines(filename)?
+        .flatten()
+        .map(|line| line.chars().map(|c| c.to_digit(10).unwrap()).collect())
+        .collect();
 
     let mut trailheads: Vec<(usize, usize)> = Vec::new();
     let mut graph = G::new();
@@ -30,22 +33,20 @@ fn main() {
         }
     }
 
-    println!("P1: {}", calculate_p1_ans(&graph, &trailheads));
-    println!("P2: {}", calculate_p2_ans(&graph, &trailheads));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+    Ok((graph, trailheads))
 }
 
-type G = Graph<(usize, usize), i32>;
-
-fn calculate_p1_ans(graph: &G, trailheads: &[(usize, usize)]) -> u32 {
-    trailheads
+pub fn part1(input: &Input) -> Option<u32> {
+    let ans = input
+        .1
         .iter()
-        .map(|start| score_trailhead(graph, start))
-        .sum()
+        .map(|start| score_trailhead(&input.0, start))
+        .sum();
+    Some(ans)
 }
 
-fn calculate_p2_ans(graph: &G, trailheads: &[(usize, usize)]) -> u32 {
-    trailheads.iter().map(|start| rate_path(graph, start)).sum()
+pub fn part2(input: &Input) -> Option<u32> {
+    Some(input.1.iter().map(|start| rate_path(&input.0, start)).sum())
 }
 
 fn score_trailhead(graph: &G, start: &(usize, usize)) -> u32 {
@@ -94,16 +95,4 @@ fn rate_path(graph: &G, start: &(usize, usize)) -> u32 {
     inner(graph, &mut visited, &mut rating);
 
     rating
-}
-
-fn parse_puzzle_input() -> Vec<Vec<i32>> {
-    read_lines("input/day_10.txt")
-        .expect("Failed to open input file")
-        .flatten()
-        .map(|line| {
-            line.chars()
-                .map(|c| c.to_digit(10).unwrap() as i32)
-                .collect_vec()
-        })
-        .collect_vec()
 }

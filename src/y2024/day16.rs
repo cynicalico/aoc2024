@@ -1,33 +1,53 @@
-use aoc2024::read_lines;
+use crate::util::io::read_lines;
 use priority_queue::PriorityQueue;
 use std::cmp::Reverse;
 use std::collections::HashMap;
+use std::io;
 
-/** https://adventofcode.com/2024/day/16 */
-fn main() {
-    let start_time = std::time::Instant::now();
-
-    let (maze, start, end) = parse_puzzle_input();
-
-    let paths = a_star(&maze, start, end);
-
-    println!("P1: {}", score_path(&paths[0]));
-    println!(
-        "\nTook {:.04}s",
-        start_time.elapsed().as_nanos() as f64 / 1e9
-    );
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum Dir {
+    North,
+    East,
+    South,
+    West,
 }
 
 type Maze = Vec<Vec<bool>>;
 type Pos = (usize, usize);
 type Path = Vec<(Pos, Dir)>;
 
-#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
-enum Dir {
-    North,
-    East,
-    South,
-    West,
+type Input = Vec<Path>;
+
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let mut start = (0, 0);
+    let mut end = (0, 0);
+
+    let maze: Maze = read_lines(filepath)?
+        .flatten()
+        .enumerate()
+        .map(|(y, line)| {
+            line.char_indices()
+                .map(|(x, c)| {
+                    if c == 'S' {
+                        start = (y, x);
+                    } else if c == 'E' {
+                        end = (y, x);
+                    }
+                    c == '#'
+                })
+                .collect()
+        })
+        .collect();
+
+    Ok(a_star(&maze, start, end))
+}
+
+pub fn part1(input: &Input) -> Option<u32> {
+    Some(score_path(&input[0]))
+}
+
+pub fn part2(_input: &Input) -> Option<u32> {
+    None
 }
 
 fn left(p: &Pos, from: &Dir) -> Pos {
@@ -138,29 +158,4 @@ fn score_path(path: &Path) -> u32 {
             (new_cost, *dir)
         })
         .0
-}
-
-fn parse_puzzle_input() -> (Maze, Pos, Pos) {
-    let mut start = (0, 0);
-    let mut end = (0, 0);
-
-    let maze: Maze = read_lines("input/day_16.txt")
-        .expect("Failed to open input file")
-        .flatten()
-        .enumerate()
-        .map(|(y, line)| {
-            line.char_indices()
-                .map(|(x, c)| {
-                    if c == 'S' {
-                        start = (y, x);
-                    } else if c == 'E' {
-                        end = (y, x);
-                    }
-                    c == '#'
-                })
-                .collect()
-        })
-        .collect();
-
-    (maze, start, end)
 }

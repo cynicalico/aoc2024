@@ -1,22 +1,35 @@
-/* https://adventofcode.com/2024/day/1
- */
-
-use aoc2024::read_single_line;
+use crate::util::io::read_single_line;
 use itertools::Itertools;
 use std::cmp::Reverse;
 use std::collections::{BinaryHeap, HashMap};
+use std::io;
 
-fn main() {
-    let start = std::time::Instant::now();
+type Input = Vec<Option<u32>>;
 
-    let disk_map = parse_puzzle_input();
-
-    println!("P1: {}", calculate_p1_ans(disk_map.clone()));
-    println!("P2: {}", calculate_p2_ans(disk_map));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let input = read_single_line(filepath)?
+        .chars()
+        .chunks(2)
+        .into_iter()
+        .zip(0u32..)
+        .map(|(chunk, id)| {
+            let sizes = chunk.collect_vec();
+            let file_blocks = sizes[0].to_digit(10).unwrap() as usize;
+            let free_blocks = if sizes.len() > 1 {
+                sizes[1].to_digit(10).unwrap() as usize
+            } else {
+                0
+            };
+            std::iter::repeat_n(Some(id), file_blocks).chain(std::iter::repeat_n(None, free_blocks))
+        })
+        .flatten()
+        .collect_vec();
+    Ok(input)
 }
 
-fn calculate_p1_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
+pub fn part1(input: &Input) -> Option<u64> {
+    let mut disk_map = input.clone();
+
     let mut l = 0usize;
     let mut r = disk_map.iter().rposition(|o| o.is_some()).unwrap();
     while l < r {
@@ -29,10 +42,12 @@ fn calculate_p1_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
         l += 1;
     }
 
-    checksum(&disk_map)
+    Some(checksum(&disk_map))
 }
 
-fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
+pub fn part2(input: &Input) -> Option<u64> {
+    let mut disk_map = input.clone();
+
     fn find_next_file(disk_map: &[Option<u32>], start: Option<usize>) -> Option<(usize, usize)> {
         let mut r;
         if let Some(start) = start {
@@ -133,7 +148,7 @@ fn calculate_p2_ans(mut disk_map: Vec<Option<u32>>) -> u64 {
         }
     }
 
-    checksum(&disk_map)
+    Some(checksum(&disk_map))
 }
 
 fn find_free_spaces(
@@ -193,25 +208,4 @@ fn checksum(disk_map: &[Option<u32>]) -> u64 {
         .enumerate()
         .flat_map(|(idx, o)| o.map(|v| (idx as u64) * (v as u64)))
         .sum()
-}
-
-fn parse_puzzle_input() -> Vec<Option<u32>> {
-    read_single_line("input/day_9.txt")
-        .expect("Failed to open input file")
-        .chars()
-        .chunks(2)
-        .into_iter()
-        .zip(0u32..)
-        .map(|(chunk, id)| {
-            let sizes = chunk.collect_vec();
-            let file_blocks = sizes[0].to_digit(10).unwrap() as usize;
-            let free_blocks = if sizes.len() > 1 {
-                sizes[1].to_digit(10).unwrap() as usize
-            } else {
-                0
-            };
-            std::iter::repeat_n(Some(id), file_blocks).chain(std::iter::repeat_n(None, free_blocks))
-        })
-        .flatten()
-        .collect_vec()
 }

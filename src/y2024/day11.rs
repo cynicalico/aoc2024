@@ -1,34 +1,35 @@
-#![feature(let_chains)]
-
-/* https://adventofcode.com/2024/day/11
- */
-
-use aoc2024::read_single_line;
+use crate::util::io::read_single_line;
+use crate::util::parse::ParseOps;
 use itertools::Itertools;
 use std::collections::HashMap;
+use std::io;
 
-fn main() {
-    let start = std::time::Instant::now();
+type Input = (usize, usize);
 
-    let mut stone_counts = parse_puzzle_input();
+pub fn parse(filename: &str) -> io::Result<Input> {
+    let mut stone_counts = read_single_line(filename)?
+        .as_str()
+        .iter_unsigned::<u64>()
+        .counts();
 
-    println!("P1: {}", calculate_p1_ans(&mut stone_counts));
-    println!("P2: {}", calculate_p2_ans(&mut stone_counts));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
-}
-
-fn calculate_p1_ans(stone_counts: &mut HashMap<u64, usize>) -> usize {
     for _ in 0..25 {
-        blink(stone_counts);
+        blink(&mut stone_counts);
     }
-    stone_counts.values().sum()
+    let p1_ans = stone_counts.values().sum();
+
+    for _ in 0..50 {
+        blink(&mut stone_counts);
+    }
+
+    Ok((p1_ans, stone_counts.values().sum()))
 }
 
-fn calculate_p2_ans(stone_counts: &mut HashMap<u64, usize>) -> usize {
-    for _ in 0..50 {
-        blink(stone_counts);
-    }
-    stone_counts.values().sum()
+pub fn part1(input: &Input) -> Option<usize> {
+    Some(input.0)
+}
+
+pub fn part2(input: &Input) -> Option<usize> {
+    Some(input.1)
 }
 
 fn blink(stone_counts: &mut HashMap<u64, usize>) {
@@ -61,12 +62,4 @@ fn blink(stone_counts: &mut HashMap<u64, usize>) {
     }
 
     drop(std::mem::replace(stone_counts, new_stone_counts));
-}
-
-fn parse_puzzle_input() -> HashMap<u64, usize> {
-    read_single_line("input/day_11.txt")
-        .expect("Failed to open input file")
-        .split_whitespace()
-        .map(|n| n.parse().unwrap())
-        .counts()
 }

@@ -1,19 +1,30 @@
-use aoc2024::read_lines;
+use crate::util::io::read_lines;
 use itertools::Itertools;
 use regex::Regex;
+use std::io;
 
-/** https://adventofcode.com/2024/day/14 */
-fn main() {
-    let start = std::time::Instant::now();
+type Input = (Vec<((i32, i32), (i32, i32))>, i32, i32);
 
-    let robots = parse_puzzle_input();
-
-    println!("P1: {}", calculate_p1_ans(robots.clone(), 101, 103));
-    println!("P2: {}", calculate_p2_ans(robots.clone(), 101, 103));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let re = Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap();
+    let robots = read_lines(filepath)?
+        .flatten()
+        .map(|line| {
+            let (_, [x, y, dx, dy]) = re.captures(&line).map(|c| c.extract()).unwrap();
+            (
+                (x.parse().unwrap(), y.parse().unwrap()),
+                (dx.parse().unwrap(), dy.parse().unwrap()),
+            )
+        })
+        .collect();
+    Ok((robots, 101, 103))
 }
 
-fn calculate_p1_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -> usize {
+pub fn part1(input: &Input) -> Option<usize> {
+    let mut robots = input.0.clone();
+    let w = input.1;
+    let h = input.2;
+
     for _ in 0..100 {
         for ((x, y), (dx, dy)) in &mut robots {
             *x = (*x + *dx).rem_euclid(w);
@@ -21,7 +32,7 @@ fn calculate_p1_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -
         }
     }
 
-    robots
+    let ans = robots
         .into_iter()
         .flat_map(|((x, y), _)| {
             if x == w / 2 || y == h / 2 {
@@ -39,7 +50,8 @@ fn calculate_p1_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -
         })
         .counts()
         .values()
-        .product()
+        .product();
+    Some(ans)
 }
 
 /**
@@ -49,7 +61,11 @@ fn calculate_p1_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -
  *
  * https://www.reddit.com/r/adventofcode/comments/1he0asr/comment/m1zzfsh
  */
-fn calculate_p2_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -> i32 {
+pub fn part2(input: &Input) -> Option<i32> {
+    let mut robots = input.0.clone();
+    let w = input.1;
+    let h = input.2;
+
     let mut bx = 0;
     let mut by = 0;
     let mut bxvar = f32::INFINITY;
@@ -78,25 +94,10 @@ fn calculate_p2_ans(mut robots: Vec<((i32, i32), (i32, i32))>, w: i32, h: i32) -
     // TODO: Make a 3 argument pow function to replicate Python's
     //       We're taking advantage of the fact that we know inverse(w) = 51
     //       In Python: pow(w, -1, h)
-    bx + (((51 * (by - bx)) % h) * w)
+    Some(bx + (((51 * (by - bx)) % h) * w))
 }
 
 fn variance(xs: &[f32]) -> f32 {
     let mean: f32 = xs.iter().sum::<f32>() / xs.len() as f32;
     xs.iter().map(|v| (v - mean).powf(2.0)).sum::<f32>() / (xs.len() - 1) as f32
-}
-
-fn parse_puzzle_input() -> Vec<((i32, i32), (i32, i32))> {
-    let re = Regex::new(r"p=(\d+),(\d+) v=(-?\d+),(-?\d+)").unwrap();
-    read_lines("input/day_14.txt")
-        .expect("Failed to open input file")
-        .flatten()
-        .map(|line| {
-            let (_, [x, y, dx, dy]) = re.captures(&line).map(|c| c.extract()).unwrap();
-            (
-                (x.parse().unwrap(), y.parse().unwrap()),
-                (dx.parse().unwrap(), dy.parse().unwrap()),
-            )
-        })
-        .collect()
 }

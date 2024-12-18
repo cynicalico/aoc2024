@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="ALL" />
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/util/grid.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/util/integer.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/util/io.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/util/parse.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/y2024/day01.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/y2024/day02.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aoc2024.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/aoc_helper.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_1.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_10.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day10.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_11.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day11.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_12.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day12.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_13.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day13.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_14.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day14.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_15.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day15.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_16.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day16.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_17.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day17.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_2.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_3.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day03.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_4.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day04.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_5.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day05.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_6.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day06.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_7.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day07.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_8.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day08.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/day_9.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day09.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ds.rs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/ds/graph.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/graph.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="5be9bg88" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
+  <component name="ProjectId" id="2qNQYxBPMFvCyYG5020LW6JnL2n" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Run aoc.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "/home/bo/dev/aoc",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.first.attach.projects": "true",
+    "settings.editor.selected.configurable": "preferences.lookFeel",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/input/y2024" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Cargo.Run aoc">
+    <configuration name="Run aoc" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="buildProfileId" value="dev" />
+      <option name="command" value="run --package aoc --bin aoc" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test aoc" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="command" value="test --workspace" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="" />
+      <created>1734500604198</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1734500604198</updated>
+      <workItem from="1734500605369" duration="7627000" />
+      <workItem from="1734557712722" duration="4132000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>

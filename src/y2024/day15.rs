@@ -1,28 +1,13 @@
-use aoc2024::read_lines_partitioned;
+use crate::util::io::read_lines_partitioned;
 use itertools::Itertools;
 use std::cmp::PartialEq;
 use std::collections::HashSet;
+use std::io;
 use std::io::Write;
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
-/** https://adventofcode.com/2024/day/15 */
-fn main() {
-    let start = std::time::Instant::now();
-
-    let (mut warehouse, robot_start_pos, moves) = parse_puzzle_input();
-    let mut warehouse_2 = widen_warehouse(&warehouse);
-    let robot_start_pos_2 = (robot_start_pos.0, robot_start_pos.1 * 2);
-
-    move_robot(&mut warehouse, robot_start_pos, &moves);
-    move_robot(&mut warehouse_2, robot_start_pos_2, &moves);
-
-    println!("P1: {}", sum_gps(&warehouse));
-    println!("P2: {}", sum_gps(&warehouse_2));
-    println!("\nTook {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
-}
-
 #[derive(Copy, Clone, Debug, PartialEq)]
-enum Obj {
+pub enum Obj {
     None,
     Wall,
     Box,
@@ -31,11 +16,85 @@ enum Obj {
 }
 
 #[derive(Debug, PartialEq)]
-enum Dir {
+pub enum Dir {
     Up,
     Down,
     Left,
     Right,
+}
+
+type Warehouse = Vec<Vec<Obj>>;
+type Move = (Dir, i32);
+type Pos = (usize, usize);
+
+type Input = (Warehouse, Pos, Vec<Move>);
+
+pub fn parse(filepath: &str) -> io::Result<Input> {
+    let mut warehouse = Warehouse::new();
+    let mut moves = Vec::new();
+    let mut robot_start_pos = (0, 0);
+
+    let mut push_move = |c: char, n: i32| {
+        let m = match c {
+            '^' => Some(Dir::Up),
+            'v' => Some(Dir::Down),
+            '<' => Some(Dir::Left),
+            '>' => Some(Dir::Right),
+            _ => None,
+        };
+        if let Some(m) = m {
+            moves.push((m, n));
+        }
+    };
+
+    read_lines_partitioned(
+        filepath,
+        |line| {
+            warehouse.push(
+                line.char_indices()
+                    .map(|(x, c)| match c {
+                        '.' => Obj::None,
+                        '#' => Obj::Wall,
+                        'O' => Obj::Box,
+                        '@' => {
+                            robot_start_pos = (warehouse.len(), x);
+                            Obj::None
+                        }
+                        _ => unreachable!(),
+                    })
+                    .collect(),
+            );
+        },
+        |line| {
+            let mut last_c = '\0';
+            let mut c_count = 0;
+            for c in line.chars() {
+                if c != last_c {
+                    push_move(last_c, c_count);
+
+                    last_c = c;
+                    c_count = 0;
+                }
+                c_count += 1;
+            }
+            push_move(last_c, c_count);
+        },
+    )?;
+
+    Ok((warehouse, robot_start_pos, moves))
+}
+
+pub fn part1(input: &Input) -> Option<usize> {
+    let mut warehouse = input.0.clone();
+    move_robot(&mut warehouse, input.1, &input.2);
+    Some(sum_gps(&warehouse))
+}
+
+pub fn part2(input: &Input) -> Option<usize> {
+    let mut warehouse = widen_warehouse(&input.0);
+    let robot_start_pos = (input.1 .0, input.1 .1 * 2);
+    move_robot(&mut warehouse, robot_start_pos, &input.2);
+    Some(sum_gps(&warehouse))
 }
 
 impl Dir {
@@ -57,10 +116,6 @@ impl Dir {
         }
     }
 }
-
-type Warehouse = Vec<Vec<Obj>>;
-type Move = (Dir, i32);
-type Pos = (usize, usize);
 
 fn move_robot(warehouse: &mut Warehouse, robot_start_pos: Pos, moves: &[Move]) {
     let mut robot_pos = robot_start_pos;
@@ -205,62 +260,6 @@ fn widen_warehouse(warehouse: &Warehouse) -> Warehouse {
                 .collect()
         })
         .collect()
-}
-
-fn parse_puzzle_input() -> (Warehouse, Pos, Vec<Move>) {
-    let mut warehouse = Warehouse::new();
-    let mut moves = Vec::new();
-    let mut robot_start_pos = (0, 0);
-
-    let mut push_move = |c: char, n: i32| {
-        let m = match c {
-            '^' => Some(Dir::Up),
-            'v' => Some(Dir::Down),
-            '<' => Some(Dir::Left),
-            '>' => Some(Dir::Right),
-            _ => None,
-        };
-        if let Some(m) = m {
-            moves.push((m, n));
-        }
-    };
-
-    read_lines_partitioned(
-        "input/day_15.txt",
-        |line| {
-            warehouse.push(
-                line.char_indices()
-                    .map(|(x, c)| match c {
-                        '.' => Obj::None,
-                        '#' => Obj::Wall,
-                        'O' => Obj::Box,
-                        '@' => {
-                            robot_start_pos = (warehouse.len(), x);
-                            Obj::None
-                        }
-                        _ => unreachable!(),
-                    })
-                    .collect(),
-            );
-        },
-        |line| {
-            let mut last_c = '\0';
-            let mut c_count = 0;
-            for c in line.chars() {
-                if c != last_c {
-                    push_move(last_c, c_count);
-
-                    last_c = c;
-                    c_count = 0;
-                }
-                c_count += 1;
-            }
-            push_move(last_c, c_count);
-        },
-    )
-    .expect("Failed to open input file");
-
-    (warehouse, robot_start_pos, moves)
 }
 
 #[allow(dead_code)]

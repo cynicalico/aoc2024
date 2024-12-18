@@ -1,49 +1,50 @@
-/* https://adventofcode.com/2024/day/12
- */
+use crate::util::io::read_lines;
+use std::io;
+use std::iter::once;
 
-use aoc2024::read_lines;
-use itertools::Itertools;
+type Input = Vec<Vec<char>>;
 
-fn main() {
-    let start = std::time::Instant::now();
+pub fn parse(filename: &str) -> io::Result<Input> {
+    let map: Input = read_lines(filename)?
+        .flatten()
+        .map(|line| format!("\0{line}\0").chars().collect())
+        .collect();
 
-    let mut map = parse_puzzle_input();
-    map.insert(0, vec!['\0'; map[0].len()]);
-    map.push(vec!['\0'; map[0].len()]);
-
-    println!("P1: {}", calculate_p1_ans(&map));
-    println!("P1: {}", calculate_p2_ans(&map));
-    println!("Took {:.04}s", start.elapsed().as_nanos() as f64 / 1e9);
+    let w = map[0].len();
+    Ok(once(vec!['\0'; w])
+        .chain(map.into_iter())
+        .chain(once(vec!['\0'; w]))
+        .collect())
 }
 
-fn calculate_p1_ans(map: &[Vec<char>]) -> i32 {
+pub fn part1(input: &Input) -> Option<i32> {
     let mut price = 0;
-    let mut visited = vec![vec![false; map[0].len()]; map.len()];
+    let mut visited = vec![vec![false; input[0].len()]; input.len()];
 
-    for y in 1..map.len() - 1 {
-        for x in 1..map[y].len() - 1 {
+    for y in 1..input.len() - 1 {
+        for x in 1..input[y].len() - 1 {
             if !visited[y][x] {
-                price += flood_region(map, &mut visited, y, x);
+                price += flood_region(input, &mut visited, y, x);
             }
         }
     }
 
-    price
+    Some(price)
 }
 
-fn calculate_p2_ans(map: &[Vec<char>]) -> i32 {
+pub fn part2(input: &Input) -> Option<i32> {
     let mut price = 0;
-    let mut visited = vec![vec![false; map[0].len()]; map.len()];
+    let mut visited = vec![vec![false; input[0].len()]; input.len()];
 
-    for y in 1..map.len() - 1 {
-        for x in 1..map[y].len() - 1 {
+    for y in 1..input.len() - 1 {
+        for x in 1..input[y].len() - 1 {
             if !visited[y][x] {
-                price += flood_region_bulk_discount(map, &mut visited, y, x);
+                price += flood_region_bulk_discount(input, &mut visited, y, x);
             }
         }
     }
 
-    price
+    Some(price)
 }
 
 fn flood_region(
@@ -133,12 +134,4 @@ fn flood_region_bulk_discount(
     }
 
     area * corners
-}
-
-fn parse_puzzle_input() -> Vec<Vec<char>> {
-    read_lines("input/day_12.txt")
-        .expect("Failed to open input file")
-        .flatten()
-        .map(|line| format!("\0{line}\0").chars().collect_vec())
-        .collect_vec()
 }
