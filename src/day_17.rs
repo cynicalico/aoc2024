@@ -9,7 +9,7 @@ fn main() {
     let (mut regs, prog, quine) = parse_puzzle_input();
 
     println!("P1: {}", execute(&mut regs, &prog).iter().join(","));
-    println!("P2: {:?}", find_a_quine(&prog, quine));
+    println!("P2: {:?}", find_a_quine(&prog, &quine));
     println!("Took {:.04}s", start_time.elapsed().as_nanos() as f64 / 1e9);
 }
 
@@ -56,7 +56,7 @@ impl From<u64> for Opcode {
 
 type Program = Vec<(Opcode, u64)>;
 
-fn execute(regs: &mut Registers, prog: &Program) -> Vec<u32> {
+fn execute(regs: &mut Registers, prog: &Program) -> Vec<u64> {
     let mut output = Vec::new();
     let mut ip = 0;
 
@@ -73,7 +73,7 @@ fn execute(regs: &mut Registers, prog: &Program) -> Vec<u32> {
                 }
             }
             Opcode::BXC => regs.b ^= regs.c,
-            Opcode::OUT => output.push((combo(regs, *operand) % 8) as u32),
+            Opcode::OUT => output.push((combo(regs, *operand) % 8) as u64),
             Opcode::BDV => regs.b = regs.a >> combo(regs, *operand),
             Opcode::CDV => regs.c = regs.a >> combo(regs, *operand),
         }
@@ -96,47 +96,30 @@ fn combo(regs: &Registers, operand: u64) -> u64 {
     }
 }
 
-fn find_a_quine(prog: &Program, quine: String) -> u64 {
-    println!("                                 {quine}");
-    let quine_v: Vec<u32> = quine
-        .split(',')
-        .map(|n| n.parse::<u32>().unwrap())
-        .collect();
-    let width = quine.len();
-
-    let mut regs = Registers::new(0);
-
-    let mut a = 0;
+fn find_a_quine(prog: &Program, quine: &Vec<u64>) -> u64 {
+    let mut starts = Vec::<u64>::from([0]);
     loop {
-        let t = std::time::Instant::now();
-        loop {
-            regs.a = a;
-            regs.b = 0;
-            regs.c = 0;
-            let output_v = execute(&mut regs, prog);
-            if output_v == quine_v[quine_v.len() - output_v.len()..] {
-                let output = output_v.iter().join(",");
-                println!(
-                    "\rFOUND   {a:<22o}   {output:>width$}   {:.04}s",
-                    t.elapsed().as_nanos() as f64 / 1e9
-                );
-
-                if output_v.len() == quine_v.len() {
-                    return a;
-                } else {
-                    break;
+        let mut new_starts = Vec::<u64>::new();
+        for a in starts {
+            for a_test in a..a + 8 {
+                let output_v = execute(&mut Registers::new(a_test), prog);
+                if output_v == quine[quine.len() - output_v.len()..] {
+                    if output_v.len() == quine.len() {
+                        return a_test;
+                    } else {
+                        new_starts.push(a_test);
+                    }
                 }
             }
-            a += 1;
         }
-        a <<= 3;
+        starts = new_starts.into_iter().map(|a| a << 3).collect();
     }
 }
 
-fn parse_puzzle_input() -> (Registers, Program, String) {
+fn parse_puzzle_input() -> (Registers, Program, Vec<u64>) {
     let mut regs = Registers { a: 0, b: 0, c: 0 };
     let mut prog = Program::new();
-    let mut quine = String::new();
+    let mut quine = Vec::new();
 
     let re = Regex::new(r"Register ([ABC]): (\d+)|(Program): ((?:\d+,\d+,?)+)$").unwrap();
     let _ = read_lines("input/day_17.txt")
@@ -150,10 +133,12 @@ fn parse_puzzle_input() -> (Registers, Program, String) {
                 "B" => regs.b = v.parse().unwrap(),
                 "C" => regs.c = v.parse().unwrap(),
                 "Program" => {
-                    quine = v.to_string(); // Need this to compare to the output for part 2
-                    for chunk in &v.split(',').map(|n| n.parse::<u64>().unwrap()).chunks(2) {
-                        let (opcode, operand) = chunk.collect_tuple().unwrap();
-                        prog.push((opcode.into(), operand));
+                    quine = v.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
+                    for chunk in quine.chunks_exact(2) {
+                        let [opcode, operand] = chunk else {
+                            unreachable!()
+                        };
+                        prog.push(((*opcode).into(), *operand));
                     }
                 }
                 _ => unreachable!(),
