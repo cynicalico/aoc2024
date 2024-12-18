@@ -10,7 +10,7 @@ fn main() {
 
     println!("P1: {}", execute(&mut regs, &prog).iter().join(","));
     println!("P2: {:?}", find_a_quine(&prog, &quine));
-    println!("Took {:.04}s", start_time.elapsed().as_nanos() as f64 / 1e9);
+    println!("Took {:.06}s", start_time.elapsed().as_nanos() as f64 / 1e9);
 }
 
 #[derive(Debug)]
@@ -73,7 +73,7 @@ fn execute(regs: &mut Registers, prog: &Program) -> Vec<u64> {
                 }
             }
             Opcode::BXC => regs.b ^= regs.c,
-            Opcode::OUT => output.push((combo(regs, *operand) % 8) as u64),
+            Opcode::OUT => output.push(combo(regs, *operand) % 8),
             Opcode::BDV => regs.b = regs.a >> combo(regs, *operand),
             Opcode::CDV => regs.c = regs.a >> combo(regs, *operand),
         }
