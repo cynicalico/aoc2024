@@ -1,7 +1,9 @@
-use std::fs::File;
-use std::io;
-use std::io::{BufRead, Read};
-use std::path::Path;
+use std::{
+    fs::File,
+    io,
+    io::{BufRead, Read},
+    path::Path,
+};
 
 pub fn read<P>(filename: P) -> io::Result<String>
 where

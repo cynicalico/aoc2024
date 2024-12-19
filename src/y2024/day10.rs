@@ -1,9 +1,6 @@
-use crate::util::graph::Graph;
-use crate::util::grid::get_neighbors_4;
-use crate::util::io::read_lines;
+use crate::util::{graph::Graph, grid::get_neighbors_4, io::read_lines};
 use hashlink::LinkedHashSet;
-use std::collections::HashSet;
-use std::io;
+use std::{collections::HashSet, io};
 
 type G = Graph<(usize, usize), u32>;
 type Input = (G, Vec<(usize, usize)>);
@@ -37,16 +34,11 @@ pub fn parse(filename: &str) -> io::Result<Input> {
 }
 
 pub fn part1(input: &Input) -> Option<u32> {
-    let ans = input
-        .1
-        .iter()
-        .map(|start| score_trailhead(&input.0, start))
-        .sum();
-    Some(ans)
+    input.1.iter().map(|start| score_trailhead(&input.0, start)).sum::<u32>().into()
 }
 
 pub fn part2(input: &Input) -> Option<u32> {
-    Some(input.1.iter().map(|start| rate_path(&input.0, start)).sum())
+    input.1.iter().map(|start| rate_path(&input.0, start)).sum::<u32>().into()
 }
 
 fn score_trailhead(graph: &G, start: &(usize, usize)) -> u32 {

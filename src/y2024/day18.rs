@@ -1,10 +1,11 @@
-use crate::util::io::read_lines;
-use crate::util::parse::ParseOps;
+use crate::util::{io::read_lines, parse::ParseOps};
 use itertools::Itertools;
 use priority_queue::PriorityQueue;
-use std::cmp::Reverse;
-use std::collections::{HashMap, HashSet};
-use std::io;
+use std::{
+    cmp::Reverse,
+    collections::{HashMap, HashSet},
+    io,
+};
 
 type Input = Vec<(usize, usize)>;
 
@@ -46,7 +47,7 @@ pub fn part2(input: &Input) -> Option<String> {
             return Some(format!("{x},{y}"));
         }
     }
-    Some("No ans, goal always reachable".to_owned())
+    "No ans, goal always reachable".to_owned().into()
 }
 
 const W: usize = 71;

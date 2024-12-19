@@ -15,26 +15,15 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
             guard_start_pos = (lab.len(), guard_pos);
         }
 
-        lab.push(
-            chars
-                .map(|c| Cell {
-                    obstacle: c == '#',
-                    visited_deltas: vec![],
-                })
-                .collect_vec(),
-        )
+        lab.push(chars.map(|c| Cell { obstacle: c == '#', visited_deltas: vec![] }).collect_vec())
     }
 
     Ok(calculate_ans(&mut lab, guard_start_pos))
 }
 
-pub fn part1(input: &Input) -> Option<usize> {
-    Some(input.0)
-}
+pub fn part1(input: &Input) -> Option<usize> { input.0.into() }
 
-pub fn part2(input: &Input) -> Option<u32> {
-    Some(input.1)
-}
+pub fn part2(input: &Input) -> Option<u32> { input.1.into() }
 
 struct Cell {
     obstacle: bool,
@@ -49,10 +38,7 @@ struct Guard {
 }
 
 fn calculate_ans(lab: &mut Map, guard_start_pos: (usize, usize)) -> (usize, u32) {
-    let mut guard = Guard {
-        pos: guard_start_pos,
-        delta: (0, -1),
-    };
+    let mut guard = Guard { pos: guard_start_pos, delta: (0, -1) };
 
     reset_lab(lab, &mut guard, guard_start_pos);
     while let Some(step_pos) = try_get_step_pos(lab, &guard) {
@@ -102,16 +88,11 @@ fn reset_lab(lab: &mut Map, guard: &mut Guard, guard_start_pos: (usize, usize)) 
         }
     }
 
-    lab[guard.pos.0][guard.pos.1]
-        .visited_deltas
-        .push(guard.delta);
+    lab[guard.pos.0][guard.pos.1].visited_deltas.push(guard.delta);
 }
 
 fn try_get_step_pos(lab: &Map, guard: &Guard) -> Option<(usize, usize)> {
-    let step_pos = (
-        guard.pos.0 as i32 + guard.delta.0,
-        guard.pos.1 as i32 + guard.delta.1,
-    );
+    let step_pos = (guard.pos.0 as i32 + guard.delta.0, guard.pos.1 as i32 + guard.delta.1);
     (step_pos.0 >= 0
         && step_pos.0 < lab.len() as i32
         && step_pos.1 >= 0
@@ -128,16 +109,11 @@ fn do_step(lab: &mut Map, guard: &mut Guard, step_pos: &(usize, usize)) -> bool 
         guard.pos = *step_pos;
     }
 
-    if lab[guard.pos.0][guard.pos.1]
-        .visited_deltas
-        .contains(&guard.delta)
-    {
+    if lab[guard.pos.0][guard.pos.1].visited_deltas.contains(&guard.delta) {
         loop_detected = true;
     }
 
-    lab[guard.pos.0][guard.pos.1]
-        .visited_deltas
-        .push(guard.delta);
+    lab[guard.pos.0][guard.pos.1].visited_deltas.push(guard.delta);
 
     loop_detected
 }

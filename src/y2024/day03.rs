@@ -21,12 +21,7 @@ pub fn parse(filepath: &str) -> io::Result<Vec<Instruction>> {
             // This regex returns 5 groups, and each instruction is non-overlapping, so
             // we can filter out the None groups, and be left with a tag group, followed by
             // the arguments for that tag if they exist
-            let cap_str = c
-                .iter()
-                .filter_map(|m| m)
-                .map(|m| m.as_str())
-                .skip(1)
-                .collect_vec();
+            let cap_str = c.iter().filter_map(|m| m).map(|m| m.as_str()).skip(1).collect_vec();
 
             instructions.push(match cap_str[0] {
                 "do" => Instruction::Do,
@@ -41,14 +36,17 @@ pub fn parse(filepath: &str) -> io::Result<Vec<Instruction>> {
 }
 
 pub fn part1(input: &Input) -> Option<i32> {
-    Some(input.iter().fold(0, |acc, i| match i {
-        Instruction::Mul(n, m) => acc + n * m,
-        _ => acc,
-    }))
+    input
+        .iter()
+        .fold(0, |acc, i| match i {
+            Instruction::Mul(n, m) => acc + n * m,
+            _ => acc,
+        })
+        .into()
 }
 
 pub fn part2(input: &Input) -> Option<i32> {
-    let ans = input
+    input
         .iter()
         .fold((0, true), |(acc, mul_enabled), i| match i {
             Instruction::Do => (acc, true),
@@ -61,6 +59,6 @@ pub fn part2(input: &Input) -> Option<i32> {
                 }
             }
         })
-        .0;
-    Some(ans)
+        .0
+        .into()
 }

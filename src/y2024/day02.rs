@@ -1,5 +1,4 @@
-use crate::util::io::read_lines;
-use crate::util::parse::*;
+use crate::util::{io::read_lines, parse::*};
 use itertools::Itertools;
 use std::io;
 
@@ -14,9 +13,7 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     Ok(reports.into_iter().partition(|report| is_safe(report)))
 }
 
-pub fn part1(input: &Input) -> Option<usize> {
-    Some(input.0.len())
-}
+pub fn part1(input: &Input) -> Option<usize> { input.0.len().into() }
 
 pub fn part2(input: &Input) -> Option<usize> {
     let mut n = 0;
@@ -34,16 +31,11 @@ pub fn part2(input: &Input) -> Option<usize> {
             }
         }
     }
-
     Some(input.0.len() + n)
 }
 
 fn is_safe(report: &[i32]) -> bool {
     let is_monotonic = report.windows(2).map(|w| w[0].cmp(&w[1])).all_equal();
-
-    let is_stablish = report
-        .windows(2)
-        .all(|w| (1..4).contains(&w[0].abs_diff(w[1])));
-
+    let is_stablish = report.windows(2).all(|w| (1..4).contains(&w[0].abs_diff(w[1])));
     is_monotonic && is_stablish
 }

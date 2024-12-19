@@ -1,5 +1,4 @@
-use crate::util::io::read_lines;
-use crate::util::parse::ParseOps;
+use crate::util::{io::read_lines, parse::ParseOps};
 use itertools::{Either, Itertools};
 use std::io;
 
@@ -27,12 +26,10 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     Ok(input)
 }
 
-pub fn part1(input: &Input) -> Option<u64> {
-    Some(input.0.iter().sum::<u64>())
-}
+pub fn part1(input: &Input) -> Option<u64> { input.0.iter().sum::<u64>().into() }
 
 pub fn part2(input: &Input) -> Option<u64> {
-    Some(input.0.iter().sum::<u64>() + input.1.iter().flatten().sum::<u64>())
+    (input.0.iter().sum::<u64>() + input.1.iter().flatten().sum::<u64>()).into()
 }
 
 enum Op {

@@ -4,10 +4,7 @@ use std::io;
 type Input = Vec<Vec<char>>;
 
 pub fn parse(filepath: &str) -> io::Result<Input> {
-    Ok(read_lines(filepath)?
-        .flatten()
-        .map(|line| line.chars().collect())
-        .collect())
+    Ok(read_lines(filepath)?.flatten().map(|line| line.chars().collect()).collect())
 }
 
 pub fn part1(input: &Input) -> Option<u32> {
@@ -51,10 +48,8 @@ fn count_xmas(word_search: &[Vec<char>], y: usize, x: usize) -> u32 {
 
             let mut found_word = true;
             for i in 0..word.len() {
-                let pos = (
-                    (y as i32 + (i as i32 * dy)) as usize,
-                    (x as i32 + (i as i32 * dx)) as usize,
-                );
+                let pos =
+                    ((y as i32 + (i as i32 * dy)) as usize, (x as i32 + (i as i32 * dx)) as usize);
 
                 let c = word_search.get(pos.0).and_then(|row| row.get(pos.1));
                 if *c.unwrap_or(&'\0') != word[i] {

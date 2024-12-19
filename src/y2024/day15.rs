@@ -1,9 +1,6 @@
 use crate::util::io::read_lines_partitioned;
 use itertools::Itertools;
-use std::cmp::PartialEq;
-use std::collections::HashSet;
-use std::io;
-use std::io::Write;
+use std::{cmp::PartialEq, collections::HashSet, io, io::Write};
 use termcolor::{Color, ColorChoice, ColorSpec, StandardStream, WriteColor};
 
 #[derive(Copy, Clone, Debug, PartialEq)]
@@ -87,14 +84,14 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
 pub fn part1(input: &Input) -> Option<usize> {
     let mut warehouse = input.0.clone();
     move_robot(&mut warehouse, input.1, &input.2);
-    Some(sum_gps(&warehouse))
+    sum_gps(&warehouse).into()
 }
 
 pub fn part2(input: &Input) -> Option<usize> {
     let mut warehouse = widen_warehouse(&input.0);
     let robot_start_pos = (input.1 .0, input.1 .1 * 2);
     move_robot(&mut warehouse, robot_start_pos, &input.2);
-    Some(sum_gps(&warehouse))
+    sum_gps(&warehouse).into()
 }
 
 impl Dir {
@@ -163,13 +160,7 @@ fn try_push_box_lr(warehouse: &mut Warehouse, start: Pos, dir: &Dir) -> Option<P
         wide_up_down(warehouse, start, dir).and_then(|to_move| {
             to_move
                 .into_iter()
-                .sorted_by(|a, b| {
-                    if dir == &Dir::Up {
-                        a.0.cmp(&b.0)
-                    } else {
-                        b.0.cmp(&a.0)
-                    }
-                })
+                .sorted_by(|a, b| if dir == &Dir::Up { a.0.cmp(&b.0) } else { b.0.cmp(&a.0) })
                 .for_each(|p| swap_objs(warehouse, &p, &moved_pos(&p, dir)));
             Some(start)
         })
@@ -177,10 +168,7 @@ fn try_push_box_lr(warehouse: &mut Warehouse, start: Pos, dir: &Dir) -> Option<P
 }
 
 fn moved_pos(p: &Pos, d: &Dir) -> Pos {
-    (
-        (p.0 as i32 + d.delta().0) as usize,
-        (p.1 as i32 + d.delta().1) as usize,
-    )
+    ((p.0 as i32 + d.delta().0) as usize, (p.1 as i32 + d.delta().1) as usize)
 }
 
 fn swap_objs(warehouse: &mut Warehouse, p0: &Pos, p1: &Pos) {
@@ -276,10 +264,7 @@ impl Obj {
 
     pub fn color_spec(&self) -> ColorSpec {
         match self {
-            Obj::None => ColorSpec::new()
-                .set_fg(Some(Color::White))
-                .set_dimmed(true)
-                .to_owned(),
+            Obj::None => ColorSpec::new().set_fg(Some(Color::White)).set_dimmed(true).to_owned(),
             Obj::Wall => ColorSpec::new().set_fg(Some(Color::White)).to_owned(),
             Obj::Box => ColorSpec::new().set_fg(Some(Color::Green)).to_owned(),
             Obj::BoxL => ColorSpec::new().set_fg(Some(Color::Magenta)).to_owned(),
@@ -294,11 +279,7 @@ fn print_warehouse(warehouse: &Warehouse, robot_pos: Pos) -> std::io::Result<()>
     for (y, row) in warehouse.iter().enumerate() {
         for (x, o) in row.iter().enumerate() {
             if (y, x) == robot_pos {
-                stdout.set_color(
-                    ColorSpec::new()
-                        .set_fg(Some(Color::White))
-                        .set_intense(true),
-                )?;
+                stdout.set_color(ColorSpec::new().set_fg(Some(Color::White)).set_intense(true))?;
                 write!(&mut stdout, "@")?;
             } else {
                 stdout.set_color(&o.color_spec())?;

@@ -1,16 +1,11 @@
-use crate::util::io::read_single_line;
-use crate::util::parse::ParseOps;
+use crate::util::{io::read_single_line, parse::ParseOps};
 use itertools::Itertools;
-use std::collections::HashMap;
-use std::io;
+use std::{collections::HashMap, io};
 
 type Input = (usize, usize);
 
 pub fn parse(filename: &str) -> io::Result<Input> {
-    let mut stone_counts = read_single_line(filename)?
-        .as_str()
-        .iter_unsigned::<u64>()
-        .counts();
+    let mut stone_counts = read_single_line(filename)?.as_str().iter_unsigned::<u64>().counts();
 
     for _ in 0..25 {
         blink(&mut stone_counts);
@@ -24,13 +19,9 @@ pub fn parse(filename: &str) -> io::Result<Input> {
     Ok((p1_ans, stone_counts.values().sum()))
 }
 
-pub fn part1(input: &Input) -> Option<usize> {
-    Some(input.0)
-}
+pub fn part1(input: &Input) -> Option<usize> { input.0.into() }
 
-pub fn part2(input: &Input) -> Option<usize> {
-    Some(input.1)
-}
+pub fn part2(input: &Input) -> Option<usize> { input.1.into() }
 
 fn blink(stone_counts: &mut HashMap<u64, usize>) {
     let mut new_stone_counts: HashMap<u64, usize> = HashMap::new();
@@ -50,10 +41,8 @@ fn blink(stone_counts: &mut HashMap<u64, usize>) {
         } else if let num_digits = stone_v.ilog10() + 1
             && (num_digits % 2 == 0)
         {
-            let (half1, half2) = (
-                stone_v / (10u64.pow(num_digits / 2)),
-                stone_v % (10u64.pow(num_digits / 2)),
-            );
+            let (half1, half2) =
+                (stone_v / (10u64.pow(num_digits / 2)), stone_v % (10u64.pow(num_digits / 2)));
             insert_or_add(half1);
             insert_or_add(half2);
         } else {

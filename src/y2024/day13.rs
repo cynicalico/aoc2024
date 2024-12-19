@@ -1,5 +1,4 @@
-use crate::util::io::read;
-use crate::util::parse::ParseOps;
+use crate::util::{io::read, parse::ParseOps};
 use std::io;
 
 type Input = (Vec<Option<i64>>, Vec<Option<i64>>);
@@ -14,13 +13,9 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     Ok((p1, p2))
 }
 
-pub fn part1(input: &Input) -> Option<i64> {
-    Some(input.0.iter().flatten().sum())
-}
+pub fn part1(input: &Input) -> Option<i64> { input.0.iter().flatten().sum::<i64>().into() }
 
-pub fn part2(input: &Input) -> Option<i64> {
-    Some(input.1.iter().flatten().sum())
-}
+pub fn part2(input: &Input) -> Option<i64> { input.1.iter().flatten().sum::<i64>().into() }
 
 fn solve_system(xs: &[i64], c: i64) -> Option<i64> {
     let d = xs[0] * xs[3] - xs[2] * xs[1];

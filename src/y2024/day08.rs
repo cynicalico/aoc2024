@@ -1,8 +1,6 @@
 use crate::util::io::read_lines;
 use itertools::Itertools;
-use std::collections::HashMap;
-use std::io;
-use std::iter::once;
+use std::{collections::HashMap, io, iter::once};
 
 type Input = (i32, i32, HashMap<char, Vec<(i32, i32)>>);
 
@@ -29,11 +27,11 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
 }
 
 pub fn part1(input: &Input) -> Option<usize> {
-    Some(calculate_ans(input.0, input.1, &input.2, once(1i32)))
+    calculate_ans(input.0, input.1, &input.2, once(1i32)).into()
 }
 
 pub fn part2(input: &Input) -> Option<usize> {
-    Some(calculate_ans(input.0, input.1, &input.2, 0i32..))
+    calculate_ans(input.0, input.1, &input.2, 0i32..).into()
 }
 
 fn calculate_ans<I>(map_w: i32, map_h: i32, locs: &HashMap<char, Vec<(i32, i32)>>, it: I) -> usize
@@ -57,12 +55,7 @@ where
     };
 
     locs.iter()
-        .map(|(_, vs)| {
-            vs.iter()
-                .combinations(2)
-                .map(|v| find_antinodes(*v[0], *v[1]))
-                .flatten()
-        })
+        .map(|(_, vs)| vs.iter().combinations(2).map(|v| find_antinodes(*v[0], *v[1])).flatten())
         .flatten()
         .unique()
         .count()

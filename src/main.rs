@@ -1,10 +1,11 @@
-use aoc::util::parse::ParseOps;
-use aoc::*;
+use aoc::{util::parse::ParseOps, *};
 use clap::Parser;
-use std::io;
-use std::iter::empty;
-use std::path::{Path, PathBuf};
-use std::time::{Duration, Instant};
+use std::{
+    io,
+    iter::empty,
+    path::{Path, PathBuf},
+    time::{Duration, Instant},
+};
 
 /// AoC Solutions Runner
 #[derive(Parser, Debug)]
@@ -38,13 +39,7 @@ fn main() {
     let mut solved = 0;
     let mut duration = Duration::ZERO;
 
-    for Solution {
-        year,
-        day,
-        filepath,
-        wrapper,
-    } in solutions
-    {
+    for Solution { year, day, filepath, wrapper } in solutions {
         let filepath = &args.file.as_ref().unwrap_or(&filepath);
 
         let instant = Instant::now();

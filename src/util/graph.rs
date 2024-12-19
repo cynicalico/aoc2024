@@ -1,5 +1,7 @@
-use std::collections::{HashMap, HashSet};
-use std::hash::Hash;
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
 
 pub struct Graph<T, V>
 where
@@ -15,16 +17,9 @@ where
     T: Eq + Hash,
     V: Eq + Hash,
 {
-    pub fn new() -> Self {
-        Graph {
-            nodes: HashMap::new(),
-            edges: HashMap::new(),
-        }
-    }
+    pub fn new() -> Self { Graph { nodes: HashMap::new(), edges: HashMap::new() } }
 
-    pub fn add_node(&mut self, id: T, value: V) {
-        self.nodes.insert(id, value);
-    }
+    pub fn add_node(&mut self, id: T, value: V) { self.nodes.insert(id, value); }
 
     pub fn add_edge(&mut self, from: T, to: T) {
         match self.edges.get_mut(&from) {
@@ -37,11 +32,7 @@ where
         }
     }
 
-    pub fn val(&self, id: &T) -> Option<&V> {
-        self.nodes.get(id)
-    }
+    pub fn val(&self, id: &T) -> Option<&V> { self.nodes.get(id) }
 
-    pub fn adj(&self, from: &T) -> Option<&HashSet<T>> {
-        self.edges.get(from)
-    }
+    pub fn adj(&self, from: &T) -> Option<&HashSet<T>> { self.edges.get(from) }
 }

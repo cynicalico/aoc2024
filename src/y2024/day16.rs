@@ -1,8 +1,6 @@
 use crate::util::io::read_lines;
 use priority_queue::PriorityQueue;
-use std::cmp::Reverse;
-use std::collections::HashMap;
-use std::io;
+use std::{cmp::Reverse, collections::HashMap, io};
 
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Dir {
@@ -42,13 +40,9 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     Ok(a_star(&maze, start, end))
 }
 
-pub fn part1(input: &Input) -> Option<u32> {
-    Some(score_path(&input[0]))
-}
+pub fn part1(input: &Input) -> Option<u32> { score_path(&input[0]).into() }
 
-pub fn part2(_input: &Input) -> Option<u32> {
-    None
-}
+pub fn part2(_input: &Input) -> Option<u32> { None }
 
 fn left(p: &Pos, from: &Dir) -> Pos {
     match from {

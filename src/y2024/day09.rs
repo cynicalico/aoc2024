@@ -1,8 +1,10 @@
 use crate::util::io::read_single_line;
 use itertools::Itertools;
-use std::cmp::Reverse;
-use std::collections::{BinaryHeap, HashMap};
-use std::io;
+use std::{
+    cmp::Reverse,
+    collections::{BinaryHeap, HashMap},
+    io,
+};
 
 type Input = Vec<Option<u32>>;
 
@@ -15,11 +17,8 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
         .map(|(chunk, id)| {
             let sizes = chunk.collect_vec();
             let file_blocks = sizes[0].to_digit(10).unwrap() as usize;
-            let free_blocks = if sizes.len() > 1 {
-                sizes[1].to_digit(10).unwrap() as usize
-            } else {
-                0
-            };
+            let free_blocks =
+                if sizes.len() > 1 { sizes[1].to_digit(10).unwrap() as usize } else { 0 };
             std::iter::repeat_n(Some(id), file_blocks).chain(std::iter::repeat_n(None, free_blocks))
         })
         .flatten()
@@ -93,9 +92,7 @@ pub fn part2(input: &Input) -> Option<u64> {
     loop {
         file = find_next_file(
             &disk_map,
-            file.map_or(Some(disk_map.len() - 1), |(l, _): (usize, _)| {
-                l.checked_sub(1)
-            }),
+            file.map_or(Some(disk_map.len() - 1), |(l, _): (usize, _)| l.checked_sub(1)),
         );
         match file {
             None => break,
@@ -203,9 +200,5 @@ fn find_free_spaces(
 }
 
 fn checksum(disk_map: &[Option<u32>]) -> u64 {
-    disk_map
-        .iter()
-        .enumerate()
-        .flat_map(|(idx, o)| o.map(|v| (idx as u64) * (v as u64)))
-        .sum()
+    disk_map.iter().enumerate().flat_map(|(idx, o)| o.map(|v| (idx as u64) * (v as u64))).sum()
 }

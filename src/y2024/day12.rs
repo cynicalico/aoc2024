@@ -1,6 +1,5 @@
 use crate::util::io::read_lines;
-use std::io;
-use std::iter::once;
+use std::{io, iter::once};
 
 type Input = Vec<Vec<char>>;
 
@@ -11,10 +10,7 @@ pub fn parse(filename: &str) -> io::Result<Input> {
         .collect();
 
     let w = map[0].len();
-    Ok(once(vec!['\0'; w])
-        .chain(map.into_iter())
-        .chain(once(vec!['\0'; w]))
-        .collect())
+    Ok(once(vec!['\0'; w]).chain(map.into_iter()).chain(once(vec!['\0'; w])).collect())
 }
 
 pub fn part1(input: &Input) -> Option<i32> {
@@ -110,12 +106,9 @@ fn flood_region_bulk_discount(
                 kernel[(o.0 + 1) as usize][(o.1 + 1) as usize] = map[op.0][op.1];
             }
 
-            for ((p00, p01), (p10, p11)) in [
-                ((0, 1), (1, 0)),
-                ((0, 1), (1, 2)),
-                ((2, 1), (1, 0)),
-                ((2, 1), (1, 2)),
-            ] {
+            for ((p00, p01), (p10, p11)) in
+                [((0, 1), (1, 0)), ((0, 1), (1, 2)), ((2, 1), (1, 0)), ((2, 1), (1, 2))]
+            {
                 // outer corner
                 if kernel[p00][p01] != kernel[1][1] && kernel[p10][p11] != kernel[1][1] {
                     corners += 1;

@@ -23,21 +23,10 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
 }
 
 pub fn part1(input: &Input) -> Option<u32> {
-    let ans = input
-        .0
-        .iter()
-        .zip(&input.1)
-        .map(|(n, m)| n.abs_diff(*m))
-        .sum();
-    Some(ans)
+    input.0.iter().zip(&input.1).map(|(n, m)| n.abs_diff(*m)).sum::<u32>().into()
 }
 
 pub fn part2(input: &Input) -> Option<i32> {
     let l2_counts = input.1.iter().counts();
-    let ans = input
-        .0
-        .iter()
-        .map(|n| n * *l2_counts.get(n).unwrap_or(&0) as i32)
-        .sum();
-    Some(ans)
+    input.0.iter().map(|n| n * *l2_counts.get(n).unwrap_or(&0) as i32).sum::<i32>().into()
 }

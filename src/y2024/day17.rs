@@ -32,47 +32,34 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     let mut quine = Vec::new();
 
     let re = Regex::new(r"Register ([ABC]): (\d+)|(Program): ((?:\d+,\d+,?)+)$").unwrap();
-    let _ = read_lines(filepath)?
-        .flatten()
-        .filter(|line| !line.is_empty())
-        .for_each(|line| {
-            let (_, [k, v]) = re.captures(&line).map(|c| c.extract()).unwrap();
-            match k {
-                "A" => regs.a = v.parse().unwrap(),
-                "B" => regs.b = v.parse().unwrap(),
-                "C" => regs.c = v.parse().unwrap(),
-                "Program" => {
-                    quine = v.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
-                    for chunk in quine.chunks_exact(2) {
-                        let [opcode, operand] = chunk else {
-                            unreachable!()
-                        };
-                        prog.push(((*opcode).into(), *operand));
-                    }
+    let _ = read_lines(filepath)?.flatten().filter(|line| !line.is_empty()).for_each(|line| {
+        let (_, [k, v]) = re.captures(&line).map(|c| c.extract()).unwrap();
+        match k {
+            "A" => regs.a = v.parse().unwrap(),
+            "B" => regs.b = v.parse().unwrap(),
+            "C" => regs.c = v.parse().unwrap(),
+            "Program" => {
+                quine = v.split(',').map(|n| n.parse::<u64>().unwrap()).collect();
+                for chunk in quine.chunks_exact(2) {
+                    let [opcode, operand] = chunk else { unreachable!() };
+                    prog.push(((*opcode).into(), *operand));
                 }
-                _ => unreachable!(),
             }
-        });
+            _ => unreachable!(),
+        }
+    });
 
     Ok((regs, prog, quine))
 }
 
 pub fn part1(input: &Input) -> Option<String> {
-    Some(
-        execute(&mut Registers::new(input.0.a), &input.1)
-            .iter()
-            .join(","),
-    )
+    execute(&mut Registers::new(input.0.a), &input.1).iter().join(",").into()
 }
 
-pub fn part2(input: &Input) -> Option<u64> {
-    Some(find_a_quine(&input.1, &input.2))
-}
+pub fn part2(input: &Input) -> Option<u64> { find_a_quine(&input.1, &input.2).into() }
 
 impl Registers {
-    pub fn new(a: u64) -> Self {
-        Self { a, b: 0, c: 0 }
-    }
+    pub fn new(a: u64) -> Self { Self { a, b: 0, c: 0 } }
 }
 
 impl From<u64> for Opcode {

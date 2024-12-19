@@ -12,12 +12,7 @@ pub struct Trie {
 }
 
 impl Trie {
-    pub fn new() -> Self {
-        Self {
-            root: Node::default(),
-            max_key_len: 0,
-        }
-    }
+    pub fn new() -> Self { Self { root: Node::default(), max_key_len: 0 } }
 
     pub fn insert(&mut self, key: &str) {
         let mut curr = &mut self.root;

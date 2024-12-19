@@ -11,10 +11,7 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
         .flatten()
         .map(|line| {
             let (_, [x, y, dx, dy]) = re.captures(&line).map(|c| c.extract()).unwrap();
-            (
-                (x.parse().unwrap(), y.parse().unwrap()),
-                (dx.parse().unwrap(), dy.parse().unwrap()),
-            )
+            ((x.parse().unwrap(), y.parse().unwrap()), (dx.parse().unwrap(), dy.parse().unwrap()))
         })
         .collect();
     Ok((robots, 101, 103))
@@ -32,7 +29,7 @@ pub fn part1(input: &Input) -> Option<usize> {
         }
     }
 
-    let ans = robots
+    robots
         .into_iter()
         .flat_map(|((x, y), _)| {
             if x == w / 2 || y == h / 2 {
@@ -50,8 +47,8 @@ pub fn part1(input: &Input) -> Option<usize> {
         })
         .counts()
         .values()
-        .product();
-    Some(ans)
+        .product::<usize>()
+        .into()
 }
 
 /**

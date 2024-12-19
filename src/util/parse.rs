@@ -1,8 +1,7 @@
 // Taken from https://github.com/maneatingape/advent-of-code-rust/blob/main/src/util/parse.rs
 
 use crate::util::integer::*;
-use std::marker::PhantomData;
-use std::str::Bytes;
+use std::{marker::PhantomData, str::Bytes};
 
 pub trait ParseByte {
     fn to_decimal(self) -> u8;
@@ -10,9 +9,7 @@ pub trait ParseByte {
 
 impl ParseByte for u8 {
     #[inline]
-    fn to_decimal(self) -> u8 {
-        self.wrapping_sub(b'0')
-    }
+    fn to_decimal(self) -> u8 { self.wrapping_sub(b'0') }
 }
 
 pub struct ParseUnsigned<'a, T> {
@@ -48,26 +45,18 @@ impl ParseOps for &str {
     }
 
     fn iter_unsigned<T: Unsigned<T>>(&self) -> ParseUnsigned<'_, T> {
-        ParseUnsigned {
-            bytes: self.bytes(),
-            phantom: PhantomData,
-        }
+        ParseUnsigned { bytes: self.bytes(), phantom: PhantomData }
     }
 
     fn iter_signed<T: Signed<T>>(&self) -> ParseSigned<'_, T> {
-        ParseSigned {
-            bytes: self.bytes(),
-            phantom: PhantomData,
-        }
+        ParseSigned { bytes: self.bytes(), phantom: PhantomData }
     }
 }
 
 impl<T: Unsigned<T>> Iterator for ParseUnsigned<'_, T> {
     type Item = T;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        try_unsigned(&mut self.bytes)
-    }
+    fn next(&mut self) -> Option<Self::Item> { try_unsigned(&mut self.bytes) }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         let (lower, upper) = self.bytes.size_hint();
@@ -78,9 +67,7 @@ impl<T: Unsigned<T>> Iterator for ParseUnsigned<'_, T> {
 impl<T: Signed<T>> Iterator for ParseSigned<'_, T> {
     type Item = T;
 
-    fn next(&mut self) -> Option<Self::Item> {
-        try_signed(&mut self.bytes)
-    }
+    fn next(&mut self) -> Option<Self::Item> { try_signed(&mut self.bytes) }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         let (lower, upper) = self.bytes.size_hint();

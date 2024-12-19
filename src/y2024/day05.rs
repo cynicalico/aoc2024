@@ -1,9 +1,10 @@
-use crate::util::io::read_lines_partitioned;
-use crate::util::parse::ParseOps;
+use crate::util::{io::read_lines_partitioned, parse::ParseOps};
 use itertools::Itertools;
-use std::cmp::Ordering;
-use std::collections::{HashMap, HashSet};
-use std::io;
+use std::{
+    cmp::Ordering,
+    collections::{HashMap, HashSet},
+    io,
+};
 
 type Input = (HashMap<u32, HashSet<u32>>, (Vec<Vec<u32>>, Vec<Vec<u32>>));
 
@@ -27,23 +28,18 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
     )?;
 
     let updates: (Vec<_>, Vec<_>) = updates.into_iter().partition(|u| {
-        u.is_sorted_by(|a, b| {
-            ordering
-                .get(b)
-                .and_then(|o| Some(!o.contains(a)))
-                .unwrap_or(true)
-        })
+        u.is_sorted_by(|a, b| ordering.get(b).and_then(|o| Some(!o.contains(a))).unwrap_or(true))
     });
 
     Ok((ordering, updates))
 }
 
 pub fn part1(input: &Input) -> Option<u32> {
-    Some(input.1 .0.iter().map(|u| u[u.len() / 2]).sum())
+    input.1 .0.iter().map(|u| u[u.len() / 2]).sum::<u32>().into()
 }
 
 pub fn part2(input: &Input) -> Option<u32> {
-    let ans = input
+    input
         .1
          .1
         .iter()
@@ -54,17 +50,13 @@ pub fn part2(input: &Input) -> Option<u32> {
                     .0
                     .get(b)
                     .and_then(|o| {
-                        Some(if o.contains(a) {
-                            Ordering::Greater
-                        } else {
-                            Ordering::Less
-                        })
+                        Some(if o.contains(a) { Ordering::Greater } else { Ordering::Less })
                     })
                     .unwrap_or(Ordering::Equal)
             });
             u
         })
         .map(|u| u[u.len() / 2])
-        .sum();
-    Some(ans)
+        .sum::<u32>()
+        .into()
 }
