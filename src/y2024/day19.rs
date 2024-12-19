@@ -50,8 +50,7 @@ fn is_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, bool>) -> bool {
             || (1..d.len().min(trie.max_key_len + 1))
                 .rev()
                 .any(|i| trie.find(&d[..i]) && is_possible(trie, &d[i..], memo));
-        memo.insert(d.to_string(), res);
-        res
+        *memo.entry_ref(d).or_insert(res)
     }
 }
 
@@ -65,7 +64,6 @@ fn count_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, u64>) -> u64 
                 total += count_possible(trie, &d[i..], memo);
             }
         }
-        memo.insert(d.to_string(), total);
-        total
+        *memo.entry_ref(d).or_insert(total)
     }
 }
