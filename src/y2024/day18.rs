@@ -3,7 +3,7 @@ use crate::util::parse::ParseOps;
 use itertools::Itertools;
 use priority_queue::PriorityQueue;
 use std::cmp::Reverse;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::io;
 
 type Input = Vec<(usize, usize)>;
@@ -18,30 +18,35 @@ pub fn parse(filepath: &str) -> io::Result<Input> {
 
 pub fn part1(input: &Input) -> Option<usize> {
     let mut maze: Maze = [false; W * H];
-    for (x, y) in input.iter().take(12) {
+    for (x, y) in input.iter().take(1024) {
         maze[(y * W) + x] = true;
     }
 
-    a_star(&maze)
+    a_star(&maze).map(|p| p.len() - 1)
 }
 
 pub fn part2(input: &Input) -> Option<String> {
-    let mut iter = input.iter();
+    let iter = input.iter();
 
     let mut maze: Maze = [false; W * H];
-    for (x, y) in iter.clone().take(12) {
+    for (x, y) in iter.clone().take(1024) {
         maze[(y * W) + x] = true;
     }
 
-    let mut iter = iter.skip(12);
+    let mut path = a_star(&maze).unwrap().into_iter().collect::<HashSet<Pos>>();
+
+    let mut iter = iter.skip(1024);
     while let Some((x, y)) = iter.next() {
         maze[(y * W) + x] = true;
-        if let Some(_) = bfs(&maze) {
-            continue;
+        if path.contains(&(*y as i32, *x as i32)) {
+            if let Some(new_path) = a_star(&maze) {
+                path = new_path.into_iter().collect::<HashSet<Pos>>();
+                continue;
+            }
+            return Some(format!("{x},{y}"));
         }
-        return Some(format!("{x},{y}"));
     }
-    Some("Invalid input, all paths okay".to_owned())
+    Some("No ans, goal always reachable".to_owned())
 }
 
 const W: usize = 71;
@@ -57,7 +62,7 @@ fn wall_at(maze: &Maze, p: &Pos) -> bool {
     }
 }
 
-fn a_star(maze: &Maze) -> Option<usize> {
+fn a_star(maze: &Maze) -> Option<Vec<Pos>> {
     let start = (0, 0);
     let goal = (H as i32 - 1, W as i32 - 1);
 
@@ -75,16 +80,16 @@ fn a_star(maze: &Maze) -> Option<usize> {
     while !open_set.is_empty() {
         let (curr, _) = open_set.peek().unwrap();
         if *curr == goal {
-            let mut steps = 0;
+            let mut path = Vec::new();
             let mut curr = goal;
             loop {
+                path.push(curr);
                 if curr == start {
                     break;
                 }
-                steps += 1;
                 curr = came_from[&curr];
             }
-            return Some(steps);
+            return Some(path);
         }
 
         let (curr, _) = open_set.pop().unwrap();
@@ -100,40 +105,6 @@ fn a_star(maze: &Maze) -> Option<usize> {
                 g_score.insert(adj, tentative_g_score);
                 f_score.insert(adj, tentative_g_score + h(&adj));
                 open_set.push(adj, Reverse(f_score[&adj]));
-            }
-        }
-    }
-
-    None
-}
-
-fn bfs(maze: &Maze) -> Option<usize> {
-    let start = (0, 0);
-    let goal = (H as i32 - 1, W as i32 - 1);
-
-    let mut queue = Vec::from([start]);
-    let mut parent: [Option<Pos>; W * H] = [None; W * H];
-
-    while !queue.is_empty() {
-        let mut p = queue.pop().unwrap();
-        if p == goal {
-            let mut steps = 0;
-            while let Some(pp) = parent[(p.0 as usize * W) + p.1 as usize] {
-                steps += 1;
-                p = pp;
-            }
-            return Some(steps);
-        }
-
-        for o in [(-1, 0), (1, 0), (0, -1), (0, 1)] {
-            let np = (p.0 + o.0, p.1 + o.1);
-            if np == start || wall_at(&maze, &np) {
-                continue;
-            }
-
-            if parent[(np.0 as usize * W) + np.1 as usize].is_none() {
-                parent[(np.0 as usize * W) + np.1 as usize] = Some(p);
-                queue.push(np);
             }
         }
     }
