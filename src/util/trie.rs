@@ -34,3 +34,16 @@ impl Trie {
         curr.is_terminal
     }
 }
+
+impl<'a, I> From<I> for Trie
+where
+    I: Iterator<Item = &'a str>,
+{
+    fn from(value: I) -> Self {
+        let mut trie = Self::new();
+        for key in value {
+            trie.insert(key);
+        }
+        trie
+    }
+}

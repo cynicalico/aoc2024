@@ -1,50 +1,21 @@
-use crate::util::{io::read_lines_partitioned, trie::*};
+use crate::util::{io::read_lines, trie::*};
 use hashbrown::HashMap;
 use std::io;
 
-type Input = (Trie, Vec<String>);
+type Input = Vec<u64>;
 
 pub fn parse(filepath: &str) -> io::Result<Input> {
-    let mut trie = Trie::new();
-    let mut designs = Vec::new();
+    let mut lines = read_lines(filepath)?.flatten().filter(|l| !l.is_empty());
 
-    read_lines_partitioned(
-        filepath,
-        |line| {
-            line.split(", ").for_each(|pattern| trie.insert(pattern));
-        },
-        |line| {
-            designs.push(line);
-        },
-    )?;
+    let trie = Trie::from(lines.next().unwrap().split(", "));
 
-    Ok((trie, designs))
-}
-
-pub fn part1(input: &Input) -> Option<usize> {
-    let (trie, designs) = input;
-    let mut memo: HashMap<String, bool> = HashMap::new();
-    designs.iter().filter(|d| is_possible(&trie, d, &mut memo)).count().into()
-}
-
-pub fn part2(input: &Input) -> Option<u64> {
-    let (trie, designs) = input;
     let mut memo: HashMap<String, u64> = HashMap::new();
-    designs.iter().map(|d| count_possible(&trie, d, &mut memo)).sum::<u64>().into()
+    Ok(lines.map(|l| count_possible(&trie, &l, &mut memo)).filter(|&n| n > 0).collect())
 }
 
-fn is_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, bool>) -> bool {
-    *match memo.get(d) {
-        Some(b) => b,
-        None => {
-            let res = trie.find(d)
-                || (1..d.len().min(trie.max_key_len + 1))
-                    .rev()
-                    .any(|i| trie.find(&d[..i]) && is_possible(trie, &d[i..], memo));
-            memo.entry_ref(d).or_insert(res)
-        }
-    }
-}
+pub fn part1(input: &Input) -> Option<usize> { input.len().into() }
+
+pub fn part2(input: &Input) -> Option<u64> { input.iter().sum::<u64>().into() }
 
 fn count_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, u64>) -> u64 {
     *match memo.get(d) {
