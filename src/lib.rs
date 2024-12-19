@@ -7,6 +7,7 @@ pub mod util {
     pub mod integer;
     pub mod io;
     pub mod parse;
+    pub mod trie;
 }
 
 pub mod y2024 {
@@ -28,4 +29,5 @@ pub mod y2024 {
     pub mod day16;
     pub mod day17;
     pub mod day18;
+    pub mod day19;
 }

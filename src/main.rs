@@ -45,10 +45,10 @@ fn main() {
         wrapper,
     } in solutions
     {
+        let filepath = &args.file.as_ref().unwrap_or(&filepath);
+
         let instant = Instant::now();
-        if let Ok((part1, part2)) =
-            wrapper(&args.file.as_ref().unwrap_or(&filepath).to_str().unwrap())
-        {
+        if let Ok((part1, part2)) = wrapper(filepath.to_str().unwrap()) {
             let elapsed = instant.elapsed();
 
             solved += if part1.is_some() { 1 } else { 0 };
@@ -111,4 +111,4 @@ make_solutions!(y2024
     day01, day02, day03, day04, day05,
     day06, day07, day08, day09, day10,
     day11, day12, day13, day14, day15,
-    day16, day17, day18);
+    day16, day17, day18, day19);
