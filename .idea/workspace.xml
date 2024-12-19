@@ -7,9 +7,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="reformat">
+    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="is_possible is redundant">
+      <change afterPath="$PROJECT_DIR$/benches/benchmark.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aoc.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aoc.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util/trie.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/trie.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/y2024/day19.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day19.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -149,7 +150,7 @@
       <updated>1734500604198</updated>
       <workItem from="1734500605369" duration="7627000" />
       <workItem from="1734557712722" duration="9456000" />
-      <workItem from="1734629707313" duration="14197000" />
+      <workItem from="1734629707313" duration="16107000" />
     </task>
     <task id="LOCAL-00001" summary="refactor entire crate to have a consistent structure between solutions, no longer own binary&#10;&#10;heavy inspiration (many direct copy+paste) from https://github.com/maneatingape/advent-of-code-rust">
       <option name="closed" value="true" />
@@ -231,7 +232,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734641827589</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="is_possible is redundant">
+      <option name="closed" value="true" />
+      <created>1734647920292</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1734647920292</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -248,6 +257,7 @@
     <MESSAGE value="get rid of unnecessary function" />
     <MESSAGE value="more entry api, seems to be slightly faster" />
     <MESSAGE value="reformat" />
-    <option name="LAST_COMMIT_MESSAGE" value="reformat" />
+    <MESSAGE value="is_possible is redundant" />
+    <option name="LAST_COMMIT_MESSAGE" value="is_possible is redundant" />
   </component>
 </project>
