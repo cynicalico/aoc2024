@@ -7,7 +7,10 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="okay i made it actually better, no more bfs, just smart about rerunning A*" />
+    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="day 19">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/y2024/day19.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day19.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -145,7 +148,7 @@
       <updated>1734500604198</updated>
       <workItem from="1734500605369" duration="7627000" />
       <workItem from="1734557712722" duration="9456000" />
-      <workItem from="1734629707313" duration="6933000" />
+      <workItem from="1734629707313" duration="7056000" />
     </task>
     <task id="LOCAL-00001" summary="refactor entire crate to have a consistent structure between solutions, no longer own binary&#10;&#10;heavy inspiration (many direct copy+paste) from https://github.com/maneatingape/advent-of-code-rust">
       <option name="closed" value="true" />
@@ -179,7 +182,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734567110720</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="day 19">
+      <option name="closed" value="true" />
+      <created>1734636653606</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1734636653607</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -190,6 +201,7 @@
     <MESSAGE value="update README.md" />
     <MESSAGE value="day 18" />
     <MESSAGE value="okay i made it actually better, no more bfs, just smart about rerunning A*" />
-    <option name="LAST_COMMIT_MESSAGE" value="okay i made it actually better, no more bfs, just smart about rerunning A*" />
+    <MESSAGE value="day 19" />
+    <option name="LAST_COMMIT_MESSAGE" value="day 19" />
   </component>
 </project>

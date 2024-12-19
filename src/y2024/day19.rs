@@ -54,12 +54,11 @@ fn is_possible(
 ) -> bool {
     let res = if let Some(b) = memo.get(d) {
         *b
-    } else if d.len() <= max_pattern_len && trie.find_terminal(d) {
-        true
     } else {
-        (1..d.len().min(max_pattern_len + 1)).rev().any(|i| {
-            trie.find_terminal(&d[..i]) && is_possible(trie, &d[i..], max_pattern_len, memo)
-        })
+        d.len() <= max_pattern_len && trie.find_terminal(d)
+            || (1..d.len().min(max_pattern_len + 1)).rev().any(|i| {
+                trie.find_terminal(&d[..i]) && is_possible(trie, &d[i..], max_pattern_len, memo)
+            })
     };
     memo.insert(d.to_string(), res);
     res
