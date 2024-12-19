@@ -46,10 +46,10 @@ fn is_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, bool>) -> bool {
     if let Some(b) = memo.get(d) {
         *b
     } else {
-        let res = d.len() <= trie.max_key_len && trie.find_terminal(d)
+        let res = d.len() <= trie.max_key_len && trie.find(d)
             || (1..d.len().min(trie.max_key_len + 1))
                 .rev()
-                .any(|i| trie.find_terminal(&d[..i]) && is_possible(trie, &d[i..], memo));
+                .any(|i| trie.find(&d[..i]) && is_possible(trie, &d[i..], memo));
         memo.insert(d.to_string(), res);
         res
     }
@@ -59,9 +59,9 @@ fn count_possible(trie: &Trie, d: &str, memo: &mut HashMap<String, u64>) -> u64 
     if let Some(c) = memo.get(d) {
         *c
     } else {
-        let mut total = if trie.find_terminal(d) { 1 } else { 0 };
+        let mut total = if trie.find(d) { 1 } else { 0 };
         for i in (1..d.len().min(trie.max_key_len + 1)).rev() {
-            if trie.find_terminal(&d[..i]) {
+            if trie.find(&d[..i]) {
                 total += count_possible(trie, &d[i..], memo);
             }
         }

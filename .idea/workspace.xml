@@ -7,7 +7,7 @@
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="reduce to single expression">
+    <list default="true" id="23896c3d-95b1-408c-8541-afaac5202190" name="Changes" comment="store max_key_len in trie directly, entry API is cool for building">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/util/trie.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/util/trie.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/y2024/day19.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/y2024/day19.rs" afterDir="false" />
@@ -149,7 +149,7 @@
       <updated>1734500604198</updated>
       <workItem from="1734500605369" duration="7627000" />
       <workItem from="1734557712722" duration="9456000" />
-      <workItem from="1734629707313" duration="9792000" />
+      <workItem from="1734629707313" duration="10393000" />
     </task>
     <task id="LOCAL-00001" summary="refactor entire crate to have a consistent structure between solutions, no longer own binary&#10;&#10;heavy inspiration (many direct copy+paste) from https://github.com/maneatingape/advent-of-code-rust">
       <option name="closed" value="true" />
@@ -199,7 +199,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734636804806</updated>
     </task>
-    <option name="localTasksCounter" value="7" />
+    <task id="LOCAL-00007" summary="store max_key_len in trie directly, entry API is cool for building">
+      <option name="closed" value="true" />
+      <created>1734639548874</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1734639548874</updated>
+    </task>
+    <option name="localTasksCounter" value="8" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -212,6 +220,7 @@
     <MESSAGE value="okay i made it actually better, no more bfs, just smart about rerunning A*" />
     <MESSAGE value="day 19" />
     <MESSAGE value="reduce to single expression" />
-    <option name="LAST_COMMIT_MESSAGE" value="reduce to single expression" />
+    <MESSAGE value="store max_key_len in trie directly, entry API is cool for building" />
+    <option name="LAST_COMMIT_MESSAGE" value="store max_key_len in trie directly, entry API is cool for building" />
   </component>
 </project>
